@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYK — لوحة التحكم</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <img src="logo/SYK-LOGO.png" alt="SYK" onerror="this.style.display='none'">
+  <span class="nav-title">نظام SYK — إدارة الخطابات</span>
+  <button class="logout-btn" onclick="logout()">خروج</button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('new')">➕ خطاب جديد</button>
+    <button class="tab-btn" onclick="switchTab('list')">📋 الخطابات المحفوظة</button>
+  </div>
+
+  <!-- ========== TAB: NEW LETTER ========== -->
+  <div class="tab-content active" id="tab-new">
+
+    <!-- رقم الخطاب -->
+    <div class="section-card">
+      <div class="section-title">رقم الخطاب</div>
+      <div class="form-grid three">
+        <div class="form-group">
+          <label>الرقم التسلسلي</label>
+          <select id="f_prefix" onchange="updateLetterNum()">
+            <option value="">اختر</option>
+            <option value="000">000</option>
+            <script>for(let i=1;i<=100;i++){document.write(`<option value="${String(i).padStart(3,'0')}">${String(i).padStart(3,'0')}</option>`)}</script>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>النوع</label>
+          <select id="f_type" onchange="updateLetterNum()">
+            <option value="">اختر</option>
+            <option value="LC">LC</option>
+            <option value="ST">ST</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>السنة</label>
+          <select id="f_year" onchange="updateLetterNum()">
+            <option value="">اختر</option>
+            <script>for(let y=2026;y<=2040;y++){document.write(`<option value="${y}"${y===2026?' selected':''}>${y}</option>`)}</script>
+          </select>
+        </div>
+      </div>
+      <div class="letter-number-preview" id="letterNumPreview">---</div>
+    </div>
+
+    <!-- بيانات العميل -->
+    <div class="section-card">
+      <div class="section-title">بيانات العميل</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>الاسم</label>
+          <input type="text" id="f_client_name" placeholder="اسم العميل">
+        </div>
+        <div class="form-group">
+          <label>الجوال</label>
+          <input type="text" id="f_client_phone" placeholder="05XXXXXXXX">
+        </div>
+        <div class="form-group full">
+          <label>المسؤول</label>
+          <input type="text" id="f_responsible" placeholder="اسم المسؤول">
+        </div>
+      </div>
+    </div>
+
+    <!-- تفاصيل المنتج الرقمي -->
+    <div class="section-card">
+      <div class="section-title">تفاصيل المنتج الرقمي</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>الخدمة</label>
+          <input type="text" id="f_service" placeholder="نوع الخدمة">
+        </div>
+        <div class="form-group">
+          <label>وصف المنتج</label>
+          <input type="text" id="f_product_description" placeholder="وصف المنتج الرقمي">
+        </div>
+      </div>
+    </div>
+
+    <!-- القسم المالي -->
+    <div class="section-card">
+      <div class="section-title">القسم المالي</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>الكمية</label>
+          <input type="text" id="f_quantity" placeholder="الكمية">
+        </div>
+        <div class="form-group">
+          <label>سعر البيع</label>
+          <input type="text" id="f_sale_price" placeholder="مثال: 150 ريال">
+        </div>
+        <div class="form-group">
+          <label>تم الشحن المباشر للحساب</label>
+          <input type="text" id="f_shipped_to" placeholder="رقم / اسم الحساب">
+        </div>
+        <div class="form-group">
+          <label>تم الشحن من حساب</label>
+          <input type="text" id="f_shipped_from" placeholder="رقم / اسم الحساب">
+        </div>
+      </div>
+    </div>
+
+    <!-- تقييم العميل -->
+    <div class="section-card">
+      <div class="section-title">تقييم العميل (المراجعة السنوية)</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>تقييم التجربة</label>
+          <input type="text" id="f_rating" placeholder="مثال: ممتاز / جيد / متوسط">
+        </div>
+        <div class="form-group">
+          <label>الملاحظات</label>
+          <textarea id="f_notes" placeholder="ملاحظات إضافية..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>التحسينات</label>
+          <textarea id="f_improvements" placeholder="مقترحات التحسين..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- رفع الايصال -->
+    <div class="section-card">
+      <div class="section-title">صورة الايصال</div>
+      <div class="file-upload-area" onclick="document.getElementById('f_receipt').click()">
+        <input type="file" id="f_receipt" accept="image/*,.pdf" onchange="previewReceipt(event)">
+        <span id="receiptLabel">📎 انقر لرفع الايصال (صورة أو PDF)</span>
+      </div>
+      <img id="receiptPreview" style="display:none;max-width:200px;margin-top:12px;border-radius:8px;border:1px solid var(--border)">
+    </div>
+
+    <!-- زر الحفظ -->
+    <div style="text-align:center;margin-bottom:40px">
+      <button class="btn btn-gold" onclick="saveLetter()" style="font-size:1.1rem;padding:14px 48px">
+        💾 حفظ الخطاب وتوليد PDF
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ========== TAB: LIST ========== -->
+  <div class="tab-content" id="tab-list">
+    <div class="section-card">
+      <div class="section-title">البحث والتصفية</div>
+      <div class="search-bar">
+        <input type="text" id="searchName" placeholder="🔍 ابحث برقم الخطاب أو الاسم" oninput="filterLetters()">
+        <select id="filterMonth" onchange="filterLetters()">
+          <option value="">كل الأشهر</option>
+          <option value="01">يناير</option><option value="02">فبراير</option>
+          <option value="03">مارس</option><option value="04">أبريل</option>
+          <option value="05">مايو</option><option value="06">يونيو</option>
+          <option value="07">يوليو</option><option value="08">أغسطس</option>
+          <option value="09">سبتمبر</option><option value="10">أكتوبر</option>
+          <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+        </select>
+        <select id="filterYear" onchange="filterLetters()">
+          <option value="">كل السنوات</option>
+          <script>for(let y=2026;y<=2040;y++){document.write(`<option value="${y}">${y}</option>`)}</script>
+        </select>
+        <button class="btn btn-outline" onclick="loadLetters()">🔄 تحديث</button>
+      </div>
+    </div>
+
+    <div class="letters-grid" id="lettersGrid">
+      <div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">
+        جاري التحميل...
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ========== MODAL: EDIT LETTER ========== -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ========== SCRIPTS ========== -->
+<script src="js/supabase-config.js"></script>
+<script src="js/pdf-generator.js"></script>
+<script>
+// ---- AUTH GUARD ----
+if (sessionStorage.getItem('syk_auth') !== '1') window.location.href = 'index.html';
+function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+
+// ---- TABS ----
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'list') loadLetters();
+}
+
+// ---- LETTER NUMBER ----
+function updateLetterNum() {
+  const p = document.getElementById('f_prefix').value;
+  const t = document.getElementById('f_type').value;
+  const y = document.getElementById('f_year').value;
+  const num = (p && t && y) ? `${p}-${t}-${y}` : '---';
+  document.getElementById('letterNumPreview').textContent = num;
+}
+
+// ---- RECEIPT PREVIEW ----
+let receiptDataURL = null;
+function previewReceipt(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('receiptLabel').textContent = '✅ ' + file.name;
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      receiptDataURL = ev.target.result;
+      const img = document.getElementById('receiptPreview');
+      img.src = ev.target.result;
+      img.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  } else {
+    receiptDataURL = null;
+  }
+}
+
+// ---- COLLECT FORM VALUES ----
+function val(id) {
+  const v = document.getElementById(id).value.trim();
+  return v || 'N/A';
+}
+
+// ---- SAVE LETTER ----
+async function saveLetter() {
+  const prefix = document.getElementById('f_prefix').value;
+  const type   = document.getElementById('f_type').value;
+  const year   = document.getElementById('f_year').value;
+  if (!prefix || !type || !year) { showToast('يرجى تحديد رقم الخطاب كاملاً', true); return; }
+
+  const letterNum = `${prefix}-${type}-${year}`;
+  const data = {
+    letter_number: letterNum,
+    letter_prefix: prefix,
+    letter_type: type,
+    letter_year: year,
+    client_name: val('f_client_name'),
+    client_phone: val('f_client_phone'),
+    responsible: val('f_responsible'),
+    service: val('f_service'),
+    product_description: val('f_product_description'),
+    quantity: val('f_quantity'),
+    sale_price: val('f_sale_price'),
+    shipped_to_account: val('f_shipped_to'),
+    shipped_from_account: val('f_shipped_from'),
+    experience_rating: val('f_rating'),
+    notes: val('f_notes'),
+    improvements: val('f_improvements'),
+  };
+
+  // رفع الايصال لـ Supabase Storage (اختياري)
+  let receiptUrl = null;
+  const receiptFile = document.getElementById('f_receipt').files[0];
+  if (receiptFile) {
+    try {
+      const { data: uploadData, error } = await supabase.storage
+        .from('receipts')
+        .upload(`${letterNum}-${Date.now()}`, receiptFile, { upsert: true });
+      if (!error && uploadData) {
+        const { data: publicUrl } = supabase.storage.from('receipts').getPublicUrl(uploadData.path);
+        receiptUrl = publicUrl?.publicUrl || null;
+      }
+    } catch(e) { console.warn('Storage not configured yet'); }
+  }
+  data.receipt_url = receiptUrl;
+
+  // حفظ في Supabase
+  try {
+    const { error } = await supabase.from('letters').insert([data]);
+    if (error) throw error;
+  } catch(e) {
+    console.warn('Supabase not configured, saving locally:', e.message);
+    // حفظ محلي احتياطي
+    const local = JSON.parse(localStorage.getItem('syk_letters') || '[]');
+    data.id = Date.now().toString();
+    data.created_at = new Date().toISOString();
+    local.push(data);
+    localStorage.setItem('syk_letters', JSON.stringify(local));
+  }
+
+  // توليد PDF
+  generateLetterPDF(data, receiptDataURL);
+  showToast('✅ تم حفظ الخطاب وتنزيل PDF');
+  resetForm();
+}
+
+// ---- RESET FORM ----
+function resetForm() {
+  ['f_prefix','f_type','f_year','f_client_name','f_client_phone','f_responsible',
+   'f_service','f_product_description','f_quantity','f_sale_price',
+   'f_shipped_to','f_shipped_from','f_rating','f_notes','f_improvements'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.tagName === 'SELECT' ? '' : '';
+  });
+  document.getElementById('f_year').value = '2026';
+  document.getElementById('receiptPreview').style.display = 'none';
+  document.getElementById('receiptLabel').textContent = '📎 انقر لرفع الايصال (صورة أو PDF)';
+  receiptDataURL = null;
+  updateLetterNum();
+}
+
+// ---- LOAD LETTERS ----
+let allLetters = [];
+async function loadLetters() {
+  const grid = document.getElementById('lettersGrid');
+  grid.innerHTML = '<div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">جاري التحميل...</div>';
+
+  try {
+    const { data, error } = await supabase.from('letters').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    allLetters = data || [];
+  } catch(e) {
+    // fallback to localStorage
+    allLetters = JSON.parse(localStorage.getItem('syk_letters') || '[]')
+      .reverse();
+  }
+  renderLetters(allLetters);
+}
+
+function renderLetters(list) {
+  const grid = document.getElementById('lettersGrid');
+  if (!list.length) {
+    grid.innerHTML = '<div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">لا توجد خطابات محفوظة</div>';
+    return;
+  }
+  grid.innerHTML = list.map(l => {
+    const d = new Date(l.created_at);
+    const dateStr = d.toLocaleDateString('ar-SA');
+    return `<div class="letter-card" onclick="openLetter('${l.id}')">
+      <div class="lc-number">${l.letter_number}</div>
+      <div class="lc-client">${l.client_name}</div>
+      <div class="lc-date">${dateStr}</div>
+    </div>`;
+  }).join('');
+}
+
+// ---- FILTER ----
+function filterLetters() {
+  const q = document.getElementById('searchName').value.toLowerCase();
+  const m = document.getElementById('filterMonth').value;
+  const y = document.getElementById('filterYear').value;
+  const filtered = allLetters.filter(l => {
+    const d = new Date(l.created_at);
+    const matchQ = !q || l.letter_number?.toLowerCase().includes(q) || l.client_name?.toLowerCase().includes(q);
+    const matchM = !m || String(d.getMonth() + 1).padStart(2, '0') === m;
+    const matchY = !y || String(d.getFullYear()) === y;
+    return matchQ && matchM && matchY;
+  });
+  renderLetters(filtered);
+}
+
+// ---- OPEN / EDIT LETTER ----
+function openLetter(id) {
+  const l = allLetters.find(x => x.id == id);
+  if (!l) return;
+  const d = new Date(l.created_at);
+
+  document.getElementById('modalContent').innerHTML = `
+    <div class="section-title" style="margin-bottom:16px">📄 ${l.letter_number}</div>
+    <div class="form-grid" style="margin-bottom:16px">
+      ${editField('client_name','الاسم',l.client_name,id)}
+      ${editField('client_phone','الجوال',l.client_phone,id)}
+      ${editField('responsible','المسؤول',l.responsible,id)}
+      ${editField('service','الخدمة',l.service,id)}
+      ${editField('product_description','وصف المنتج',l.product_description,id)}
+      ${editField('quantity','الكمية',l.quantity,id)}
+      ${editField('sale_price','سعر البيع',l.sale_price,id)}
+      ${editField('shipped_to_account','شحن للحساب',l.shipped_to_account,id)}
+      ${editField('shipped_from_account','شحن من حساب',l.shipped_from_account,id)}
+      ${editField('experience_rating','تقييم التجربة',l.experience_rating,id)}
+      ${editField('notes','الملاحظات',l.notes,id,'full')}
+      ${editField('improvements','التحسينات',l.improvements,id,'full')}
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-gold" onclick="updateLetter('${id}')">💾 حفظ التعديلات</button>
+      <button class="btn btn-success" onclick="redownloadPDF('${id}')">⬇️ تنزيل PDF</button>
+      <button class="btn btn-danger" onclick="deleteLetter('${id}')">🗑️ حذف</button>
+    </div>
+    <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;margin-top:10px">
+      تاريخ الإنشاء: ${d.toLocaleString('ar-SA')}
+    </p>
+  `;
+  document.getElementById('editModal').classList.add('active');
+}
+
+function editField(key, label, value, id, cls='') {
+  return `<div class="form-group ${cls}">
+    <label>${label}</label>
+    <input type="text" id="edit_${key}_${id}" value="${(value||'').replace(/"/g,'&quot;')}">
+  </div>`;
+}
+
+async function updateLetter(id) {
+  const l = allLetters.find(x => x.id == id);
+  const keys = ['client_name','client_phone','responsible','service','product_description',
+    'quantity','sale_price','shipped_to_account','shipped_from_account',
+    'experience_rating','notes','improvements'];
+  const updates = {};
+  keys.forEach(k => {
+    const el = document.getElementById(`edit_${k}_${id}`);
+    if (el) updates[k] = el.value.trim() || 'N/A';
+  });
+  updates.updated_at = new Date().toISOString();
+
+  try {
+    const { error } = await supabase.from('letters').update(updates).eq('id', id);
+    if (error) throw error;
+  } catch(e) {
+    // update local
+    const local = JSON.parse(localStorage.getItem('syk_letters') || '[]');
+    const idx = local.findIndex(x => x.id == id);
+    if (idx > -1) { Object.assign(local[idx], updates); localStorage.setItem('syk_letters', JSON.stringify(local)); }
+  }
+  showToast('✅ تم حفظ التعديلات');
+  closeModal();
+  loadLetters();
+}
+
+function redownloadPDF(id) {
+  const l = allLetters.find(x => x.id == id);
+  if (l) generateLetterPDF(l, null);
+}
+
+async function deleteLetter(id) {
+  if (!confirm('هل أنت متأكد من الحذف؟')) return;
+  try {
+    const { error } = await supabase.from('letters').delete().eq('id', id);
+    if (error) throw error;
+  } catch(e) {
+    const local = JSON.parse(localStorage.getItem('syk_letters') || '[]');
+    localStorage.setItem('syk_letters', JSON.stringify(local.filter(x => x.id != id)));
+  }
+  showToast('🗑️ تم الحذف');
+  closeModal();
+  loadLetters();
+}
+
+function closeModal() { document.getElementById('editModal').classList.remove('active'); }
+document.getElementById('editModal').addEventListener('click', e => { if (e.target.id === 'editModal') closeModal(); });
+
+// ---- TOAST ----
+function showToast(msg, err = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = err ? 'var(--danger)' : 'var(--success)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
