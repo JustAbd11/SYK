@@ -2,6 +2,6 @@
 // إعدادات Supabase - عدّل هذه القيم بعد إنشاء المشروع
 // =============================================
 const SUPABASE_URL = 'https://ywmpyyzkzsydciyntklx.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_MOd-5iRt0je0WaFFPe4LOw_uDxzF3rU';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bXB5eXprenN5ZGNpeW50a2x4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNzMsImV4cCI6MjA5MTkyMDI3M30.uM0Y30sIubYvJbkUl_cfIK_mHx52DgvDHUar3kGmrPg';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
