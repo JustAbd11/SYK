@@ -106,19 +106,7 @@ function buildHTML(data, logoSrc) {
     <p style="margin:0 0 6px;font-size:10.5px;line-height:1.65">نشكركم على جهودكم المخلصة ودقتكم في تنفيذ هذه العملية، إن التزامكم بتدوين هذه البيانات بمهنية عالية هو الركيزة التي نعتمد عليها في مراجعة نجاحاتنا السنوية وتطوير مستقبل متجرنا، نرجو منكم الاحتفاظ بهذا السجل والعناية به كمرجع أساسي يثبت جودة أدائكم ويعكس احترافيتكم في خدمة عملائنا، نحن نفخر بوجودكم معنا، ومعاً نستمر في تقديم الأفضل."</p>
     <p style="text-align:center;font-weight:700;margin:4px 0 10px;font-size:11px">تحية طيبة،،</p>
 
-    <!-- توقيعات -->
-    <div style="display:flex;justify-content:space-around;text-align:center;font-size:11px">
-      <div>
-        <div style="color:#555;margin-bottom:2px">عن سايروكا</div>
-        <div style="font-weight:700;font-size:12px">عبدالله</div>
-        <div style="width:100px;border-top:1px solid #444;margin:5px auto 0"></div>
-      </div>
-      <div>
-        <div style="color:#555;margin-bottom:2px">عن سايروكا</div>
-        <div style="font-weight:700;font-size:12px">سليمان</div>
-        <div style="width:100px;border-top:1px solid #444;margin:5px auto 0"></div>
-      </div>
-    </div>
+    
   </div>`;
 }
 
