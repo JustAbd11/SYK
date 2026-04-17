@@ -1,0 +1,4 @@
+var supabase = window.supabase.createClient(
+  'https://ywmpyyzkzsydciyntklx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bXB5eXprenN5ZGNpeW50a2x4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNzMsImV4cCI6MjA5MTkyMDI3M30.uM0Y30sIubYvJbkUl_cfIK_mHx52DgvDHUar3kGmrPg'
+);
