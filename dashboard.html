@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYK — لوحة التحكم</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    /* ── تابات الصندوق ── */
+    .inbox-stats {
+      display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;
+    }
+    .stat-card {
+      background:var(--card2);border:1px solid var(--border);border-radius:10px;
+      padding:18px;text-align:center;
+    }
+    .stat-card .stat-num {
+      font-size:2rem;font-weight:700;color:var(--gold);
+    }
+    .stat-card .stat-label {
+      font-size:.82rem;color:var(--text-muted);margin-top:4px;
+    }
+    /* ── شارة المستخدم ── */
+    .user-badge {
+      background:var(--card2);border:1px solid var(--border);
+      border-radius:8px;padding:5px 14px;font-size:.85rem;color:var(--gold);
+      font-weight:600;
+    }
+    /* ── شارة الحالة ── */
+    .status-badge {
+      display:inline-block;padding:3px 10px;border-radius:20px;
+      font-size:.78rem;font-weight:600;
+    }
+    .status-pending  { background:#2a2000;color:#f0a500; }
+    .status-approved { background:#0a2a0a;color:#27ae60; }
+    .status-rejected { background:#2a0a0a;color:#e74c3c; }
+    /* ── أزرار القبول/الرفض ── */
+    .btn-approve { background:#27ae60;color:#fff;padding:5px 14px;border:none;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:.82rem;font-weight:600; }
+    .btn-reject  { background:#e74c3c;color:#fff;padding:5px 14px;border:none;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:.82rem;font-weight:600; }
+    /* ── بطاقة الخطاب في المحفوظات ── */
+    .letter-card .lc-sender { font-size:.75rem;color:var(--text-muted);margin-top:3px; }
+    /* سلة المهملات */
+    .trash-card {
+      background:var(--card2);border:1px solid #3a1a1a;border-radius:10px;
+      padding:16px 14px;text-align:center;opacity:.75;
+    }
+    .trash-card .lc-number { font-size:1rem;font-weight:700;color:#e74c3c;margin-bottom:4px; }
+    .trash-card .lc-date   { font-size:.75rem;color:var(--text-muted); }
+    .trash-card .days-left { font-size:.78rem;color:#e74c3c;margin-top:4px; }
+    .trash-card .restore-btn {
+      margin-top:8px;background:transparent;border:1px solid #e74c3c;
+      color:#e74c3c;padding:4px 12px;border-radius:6px;cursor:pointer;
+      font-family:var(--font);font-size:.78rem;transition:all .2s;
+    }
+    .trash-card .restore-btn:hover { background:#e74c3c;color:#fff; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <img src="logo/SYK-LOGO.png" alt="SYK" onerror="this.style.display='none'">
+  <span class="nav-title" id="navTitle">نظام SYK</span>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="user-badge" id="userBadge"></span>
+    <button class="logout-btn" onclick="logout()">خروج</button>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div class="container">
+
+  <!-- TABS — تختلف حسب الدور -->
+  <div class="tabs" id="tabsBar"></div>
+
+  <!-- ========== TAB: خطاب جديد (مشترك) ========== -->
+  <div class="tab-content" id="tab-new">
+
+    <div class="section-card">
+      <div class="section-title">رقم الخطاب</div>
+      <div class="form-grid three">
+        <div class="form-group">
+          <label>الرقم التسلسلي</label>
+          <select id="f_prefix" onchange="updateLetterNum()">
+            <option value="">اختر</option>
+            <option value="000">000</option>
+            <script>for(let i=1;i<=100;i++)document.write(`<option value="${String(i).padStart(3,'0')}">${String(i).padStart(3,'0')}</option>`)</script>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>النوع</label>
+          <select id="f_type" onchange="updateLetterNum()">
+            <option value="">اختر</option>
+            <option value="LC">LC</option>
+            <option value="ST">ST</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>السنة</label>
+          <select id="f_year" onchange="updateLetterNum()">
+            <option value="">اختر</option>
+            <script>for(let y=2026;y<=2040;y++)document.write(`<option value="${y}"${y===2026?' selected':''}>${y}</option>`)</script>
+          </select>
+        </div>
+      </div>
+      <div class="letter-number-preview" id="letterNumPreview">---</div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">بيانات العميل</div>
+      <div class="form-grid">
+        <div class="form-group"><label>الاسم</label><input type="text" id="f_client_name" placeholder="اسم العميل"></div>
+        <div class="form-group"><label>الجوال</label><input type="text" id="f_client_phone" placeholder="05XXXXXXXX"></div>
+        <div class="form-group full"><label>المسؤول</label><input type="text" id="f_responsible" placeholder="اسم المسؤول"></div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">تفاصيل المنتج الرقمي</div>
+      <div class="form-grid">
+        <div class="form-group"><label>الخدمة</label><input type="text" id="f_service" placeholder="نوع الخدمة"></div>
+        <div class="form-group"><label>وصف المنتج</label><input type="text" id="f_product_description" placeholder="وصف المنتج الرقمي"></div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">القسم المالي</div>
+      <div class="form-grid">
+        <div class="form-group"><label>الكمية</label><input type="text" id="f_quantity" placeholder="الكمية"></div>
+        <div class="form-group"><label>سعر البيع</label><input type="text" id="f_sale_price" placeholder="مثال: 150 ريال"></div>
+        <div class="form-group"><label>تم الشحن المباشر للحساب</label><input type="text" id="f_shipped_to" placeholder="رقم / اسم الحساب"></div>
+        <div class="form-group"><label>تم الشحن من حساب</label><input type="text" id="f_shipped_from" placeholder="رقم / اسم الحساب"></div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">تقييم العميل (المراجعة السنوية)</div>
+      <div class="form-grid">
+        <div class="form-group"><label>تقييم التجربة</label><input type="text" id="f_rating" placeholder="مثال: ممتاز / جيد / متوسط"></div>
+        <div class="form-group"><label>الملاحظات</label><textarea id="f_notes" placeholder="ملاحظات..."></textarea></div>
+        <div class="form-group"><label>التحسينات</label><textarea id="f_improvements" placeholder="مقترحات..."></textarea></div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">صورة الايصال</div>
+      <div class="file-upload-area" onclick="document.getElementById('f_receipt').click()">
+        <input type="file" id="f_receipt" accept="image/*" onchange="previewReceipt(event)">
+        <span id="receiptLabel">📎 انقر لرفع الايصال</span>
+      </div>
+      <img id="receiptPreview" style="display:none;max-width:200px;margin-top:12px;border-radius:8px;border:1px solid var(--border)">
+    </div>
+
+    <div style="text-align:center;margin-bottom:40px">
+      <button class="btn btn-gold" onclick="saveLetter(this)" style="font-size:1.1rem;padding:14px 48px">
+        💾 حفظ الخطاب
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== TAB: صندوق الوارد (للمستخدمين) ========== -->
+  <div class="tab-content" id="tab-inbox">
+    <div class="section-card">
+      <div class="section-title">إحصائياتي</div>
+      <div class="inbox-stats">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">إجمالي الخطابات المرفوعة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:#27ae60" id="stat-approved">0</div>
+          <div class="stat-label">تم القبول</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:#f0a500" id="stat-pending">0</div>
+          <div class="stat-label">تحت المراجعة</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">خطاباتي</div>
+      <div class="letters-grid" id="inboxGrid">
+        <div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">جاري التحميل...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TAB: المحفوظات (للأدمن فقط) ========== -->
+  <div class="tab-content" id="tab-list">
+    <div class="section-card">
+      <div class="section-title">البحث والتصفية</div>
+      <div class="search-bar">
+        <input type="text" id="searchName" placeholder="🔍 ابحث برقم الخطاب أو الاسم" oninput="filterLetters()">
+        <select id="filterSender" onchange="filterLetters()">
+          <option value="">كل المستخدمين</option>
+          <option value="User1">User1</option>
+          <option value="User2">User2</option>
+          <option value="Admin">Admin</option>
+        </select>
+        <select id="filterStatus" onchange="filterLetters()">
+          <option value="">كل الحالات</option>
+          <option value="pending">تحت المراجعة</option>
+          <option value="approved">مقبول</option>
+        </select>
+        <select id="filterMonth" onchange="filterLetters()">
+          <option value="">كل الأشهر</option>
+          <option value="01">يناير</option><option value="02">فبراير</option>
+          <option value="03">مارس</option><option value="04">أبريل</option>
+          <option value="05">مايو</option><option value="06">يونيو</option>
+          <option value="07">يوليو</option><option value="08">أغسطس</option>
+          <option value="09">سبتمبر</option><option value="10">أكتوبر</option>
+          <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+        </select>
+        <button class="btn btn-outline" onclick="loadLetters()">🔄 تحديث</button>
+      </div>
+    </div>
+    <div class="letters-grid" id="lettersGrid">
+      <div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">جاري التحميل...</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ========== TAB: سلة المهملات (للأدمن) ========== -->
+<div class="tab-content" id="tab-trash">
+  <div class="section-card">
+    <div class="section-title">🗑️ سلة المهملات — تُحذف تلقائياً بعد 30 يوم</div>
+    <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:16px">
+      الخطابات هنا ستُحذف نهائياً بعد مرور 30 يوم من تاريخ الحذف. يمكنك استرجاعها قبل انتهاء المدة.
+    </p>
+    <div class="letters-grid" id="trashGrid">
+      <div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">جاري التحميل...</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script src="js/supabase-config.js"></script>
+<script src="js/pdf-generator.js"></script>
+<script>
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+if (sessionStorage.getItem('syk_auth') !== '1') window.location.href = 'index.html';
+
+const CURRENT_USER = sessionStorage.getItem('syk_user') || 'Admin';
+const CURRENT_ROLE = sessionStorage.getItem('syk_role') || 'admin';
+const IS_ADMIN = CURRENT_ROLE === 'admin';
+
+document.getElementById('userBadge').textContent = CURRENT_USER;
+document.getElementById('navTitle').textContent = IS_ADMIN ? 'نظام SYK — الإدارة' : 'نظام SYK';
+
+function logout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+
+// ══════════════════════════════════════════
+// TABS — حسب الدور
+// ══════════════════════════════════════════
+function buildTabs() {
+  const bar = document.getElementById('tabsBar');
+  if (IS_ADMIN) {
+    bar.innerHTML = `
+      <button class="tab-btn active" onclick="switchTab('new',this)">➕ خطاب جديد</button>
+      <button class="tab-btn" onclick="switchTab('list',this)">📋 المحفوظات</button>
+      <button class="tab-btn" onclick="switchTab('trash',this)">🗑️ سلة المهملات</button>`;
+  } else {
+    bar.innerHTML = `
+      <button class="tab-btn active" onclick="switchTab('new',this)">➕ خطاب جديد</button>
+      <button class="tab-btn" onclick="switchTab('inbox',this)">📬 صندوق الوارد</button>`;
+  }
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name === 'list')  loadLetters();
+  if (name === 'inbox') loadInbox();
+  if (name === 'trash') loadTrash();
+}
+
+buildTabs();
+document.getElementById('tab-new').classList.add('active');
+
+// ══════════════════════════════════════════
+// FORM
+// ══════════════════════════════════════════
+function updateLetterNum() {
+  const p = document.getElementById('f_prefix').value;
+  const t = document.getElementById('f_type').value;
+  const y = document.getElementById('f_year').value;
+  document.getElementById('letterNumPreview').textContent = (p&&t&&y) ? `${p}-${t}-${y}` : '---';
+}
+
+let receiptDataURL = null;
+function previewReceipt(e) {
+  const file = e.target.files[0]; if(!file) return;
+  document.getElementById('receiptLabel').textContent = '✅ ' + file.name;
+  if (file.type.startsWith('image/')) {
+    const fr = new FileReader();
+    fr.onload = ev => {
+      receiptDataURL = ev.target.result;
+      const img = document.getElementById('receiptPreview');
+      img.src = ev.target.result; img.style.display = 'block';
+    };
+    fr.readAsDataURL(file);
+  }
+}
+
+function val(id) {
+  const v = document.getElementById(id)?.value?.trim();
+  return v || 'N/A';
+}
+
+// ══════════════════════════════════════════
+// SAVE LETTER
+// ══════════════════════════════════════════
+async function saveLetter(btn) {
+  const prefix = document.getElementById('f_prefix').value;
+  const type   = document.getElementById('f_type').value;
+  const year   = document.getElementById('f_year').value;
+  if (!prefix||!type||!year) { showToast('يرجى تحديد رقم الخطاب كاملاً', true); return; }
+
+  if (btn) { btn.disabled=true; btn.textContent='⏳ جاري الحفظ...'; }
+
+  const letterNum = `${prefix}-${type}-${year}`;
+  const data = {
+    letter_number: letterNum,
+    letter_prefix: prefix, letter_type: type, letter_year: year,
+    sender: CURRENT_USER,           // ← اسم المستخدم الذي أرسل
+    status: 'pending',              // ← الحالة الافتراضية: تحت المراجعة
+    client_name:          val('f_client_name'),
+    client_phone:         val('f_client_phone'),
+    responsible:          val('f_responsible'),
+    service:              val('f_service'),
+    product_description:  val('f_product_description'),
+    quantity:             val('f_quantity'),
+    sale_price:           val('f_sale_price'),
+    shipped_to_account:   val('f_shipped_to'),
+    shipped_from_account: val('f_shipped_from'),
+    experience_rating:    val('f_rating'),
+    notes:                val('f_notes'),
+    improvements:         val('f_improvements'),
+    receipt_url: null,
+  };
+
+  // رفع الايصال
+  const receiptFile = document.getElementById('f_receipt').files[0];
+  if (receiptFile) {
+    try {
+      const { data: up, error } = await supabase.storage
+        .from('receipts')
+        .upload(`${letterNum}-${Date.now()}`, receiptFile, { upsert:true });
+      if (!error && up) {
+        const { data: pub } = supabase.storage.from('receipts').getPublicUrl(up.path);
+        data.receipt_url = pub?.publicUrl || null;
+      }
+    } catch(e) { console.warn('Storage:', e.message); }
+  }
+
+  // حفظ الايصال محلياً
+  if (receiptDataURL) localStorage.setItem('receipt_'+letterNum, receiptDataURL);
+
+  // حفظ في Supabase أو localStorage
+  try {
+    const { error } = await supabase.from('letters').insert([data]);
+    if (error) throw error;
+  } catch(e) {
+    const local = JSON.parse(localStorage.getItem('syk_letters')||'[]');
+    data.id = Date.now().toString();
+    data.created_at = new Date().toISOString();
+    local.push(data);
+    localStorage.setItem('syk_letters', JSON.stringify(local));
+  }
+
+  showToast('✅ تم حفظ الخطاب بنجاح');
+  if (btn) { btn.disabled=false; btn.textContent='💾 حفظ الخطاب'; }
+  resetForm();
+}
+
+function resetForm() {
+  ['f_prefix','f_type','f_client_name','f_client_phone','f_responsible',
+   'f_service','f_product_description','f_quantity','f_sale_price',
+   'f_shipped_to','f_shipped_from','f_rating','f_notes','f_improvements']
+    .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('f_year').value='2026';
+  document.getElementById('receiptPreview').style.display='none';
+  document.getElementById('receiptLabel').textContent='📎 انقر لرفع الايصال';
+  receiptDataURL=null; updateLetterNum();
+}
+
+// ══════════════════════════════════════════
+// صندوق الوارد (للمستخدمين)
+// ══════════════════════════════════════════
+async function loadInbox() {
+  let letters = [];
+  try {
+    const { data, error } = await supabase.from('letters')
+      .select('*')
+      .eq('sender', CURRENT_USER)
+      .order('created_at', { ascending:false });
+    if (error) throw error;
+    letters = data || [];
+  } catch(e) {
+    letters = JSON.parse(localStorage.getItem('syk_letters')||'[]')
+      .filter(l => l.sender === CURRENT_USER).reverse();
+  }
+
+  // إحصائيات
+  const total    = letters.length;
+  const approved = letters.filter(l => l.status === 'approved').length;
+  const pending  = letters.filter(l => l.status === 'pending' || !l.status).length;
+  document.getElementById('stat-total').textContent    = total;
+  document.getElementById('stat-approved').textContent = approved;
+  document.getElementById('stat-pending').textContent  = pending;
+
+  // عرض الخطابات
+  const grid = document.getElementById('inboxGrid');
+  if (!letters.length) {
+    grid.innerHTML = '<div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">لا توجد خطابات بعد</div>';
+    return;
+  }
+  grid.innerHTML = letters.map(l => {
+    const d = new Date(l.created_at);
+    const statusBadge = l.status === 'approved'
+      ? '<span class="status-badge status-approved">✅ مقبول</span>'
+      : '<span class="status-badge status-pending">⏳ تحت المراجعة</span>';
+    return `<div class="letter-card">
+      <div class="lc-number">${l.letter_number}</div>
+      <div class="lc-client">${l.client_name}</div>
+      <div class="lc-date">${d.toLocaleDateString('ar-SA')}</div>
+      <div style="margin-top:6px">${statusBadge}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+// المحفوظات (للأدمن)
+// ══════════════════════════════════════════
+let allLetters = [];
+async function loadLetters() {
+  const grid = document.getElementById('lettersGrid');
+  grid.innerHTML = '<div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">جاري التحميل...</div>';
+  try {
+    const { data, error } = await supabase.from('letters').select('*').neq('status','trash').order('created_at',{ascending:false});
+    if (error) throw error;
+    allLetters = data || [];
+  } catch(e) {
+    allLetters = JSON.parse(localStorage.getItem('syk_letters')||'[]').filter(l=>l.status!=='trash').reverse();
+  }
+  renderLetters(allLetters);
+}
+
+function renderLetters(list) {
+  const grid = document.getElementById('lettersGrid');
+  if (!list.length) {
+    grid.innerHTML = '<div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">لا توجد خطابات</div>';
+    return;
+  }
+  grid.innerHTML = list.map(l => {
+    const d = new Date(l.created_at);
+    const hasReceipt = l.receipt_url ? '🧾' : '';
+    const statusBadge = l.status === 'approved'
+      ? '<span class="status-badge status-approved">✅ مقبول</span>'
+      : '<span class="status-badge status-pending">⏳ مراجعة</span>';
+    const senderBadge = `<span style="font-size:.75rem;color:var(--text-muted)">من: <b style="color:var(--gold)">${l.sender||'Admin'}</b></span>`;
+    return `<div class="letter-card" onclick="openLetter('${l.id}')">
+      <div class="lc-number">${l.letter_number} ${hasReceipt}</div>
+      <div class="lc-client">${l.client_name}</div>
+      <div class="lc-date">${d.toLocaleDateString('ar-SA')}</div>
+      <div style="margin-top:5px">${senderBadge}</div>
+      <div style="margin-top:4px">${statusBadge}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterLetters() {
+  const q  = document.getElementById('searchName').value.toLowerCase();
+  const s  = document.getElementById('filterSender').value;
+  const st = document.getElementById('filterStatus').value;
+  const m  = document.getElementById('filterMonth').value;
+  const filtered = allLetters.filter(l => {
+    const d = new Date(l.created_at);
+    return (!q  || l.letter_number?.toLowerCase().includes(q) || l.client_name?.toLowerCase().includes(q))
+        && (!s  || l.sender === s)
+        && (!st || l.status === st || (st==='pending' && !l.status))
+        && (!m  || String(d.getMonth()+1).padStart(2,'0') === m);
+  });
+  renderLetters(filtered);
+}
+
+// ══════════════════════════════════════════
+// OPEN LETTER MODAL (أدمن)
+// ══════════════════════════════════════════
+function openLetter(id) {
+  const l = allLetters.find(x => x.id == id); if (!l) return;
+
+  const statusBadge = l.status === 'approved'
+    ? '<span class="status-badge status-approved">✅ مقبول</span>'
+    : '<span class="status-badge status-pending">⏳ تحت المراجعة</span>';
+
+  const approveBtn = l.status !== 'approved'
+    ? `<button class="btn-approve" onclick="approveLetter('${id}')">✅ قبول</button>` : '';
+
+  document.getElementById('modalContent').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div class="section-title" style="margin:0">📄 ${l.letter_number}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${statusBadge}
+        <span style="font-size:.82rem;color:var(--text-muted)">من: <b style="color:var(--gold)">${l.sender||'Admin'}</b></span>
+      </div>
+    </div>
+    <div class="form-grid" style="margin-bottom:16px">
+      ${editField('client_name','الاسم',l.client_name,id)}
+      ${editField('client_phone','الجوال',l.client_phone,id)}
+      ${editField('responsible','المسؤول',l.responsible,id)}
+      ${editField('service','الخدمة',l.service,id)}
+      ${editField('product_description','وصف المنتج',l.product_description,id)}
+      ${editField('quantity','الكمية',l.quantity,id)}
+      ${editField('sale_price','سعر البيع',l.sale_price,id)}
+      ${editField('shipped_to_account','شحن للحساب',l.shipped_to_account,id)}
+      ${editField('shipped_from_account','شحن من حساب',l.shipped_from_account,id)}
+      ${editField('experience_rating','تقييم التجربة',l.experience_rating,id)}
+      ${editField('notes','الملاحظات',l.notes,id,'full')}
+      ${editField('improvements','التحسينات',l.improvements,id,'full')}
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      ${approveBtn}
+      <button class="btn btn-gold" onclick="updateLetter('${id}')">💾 حفظ التعديلات</button>
+      <button class="btn btn-success" onclick="redownloadPDF('${id}')">⬇️ تنزيل PDF</button>
+      <button class="btn btn-danger" onclick="deleteLetter('${id}')">🗑️ حذف</button>
+    </div>
+    <p style="color:var(--text-muted);font-size:.78rem;text-align:center;margin-top:10px">
+      ${new Date(l.created_at).toLocaleString('ar-SA')}
+    </p>`;
+  document.getElementById('editModal').classList.add('active');
+}
+
+function editField(key, label, value, id, cls='') {
+  return `<div class="form-group ${cls}">
+    <label>${label}</label>
+    <input type="text" id="edit_${key}_${id}" value="${(value||'').replace(/"/g,'&quot;')}">
+  </div>`;
+}
+
+// قبول الخطاب
+async function approveLetter(id) {
+  try {
+    const { error } = await supabase.from('letters').update({ status:'approved' }).eq('id', id);
+    if (error) throw error;
+  } catch(e) {
+    const local = JSON.parse(localStorage.getItem('syk_letters')||'[]');
+    const idx = local.findIndex(x => x.id==id);
+    if (idx>-1) { local[idx].status='approved'; localStorage.setItem('syk_letters',JSON.stringify(local)); }
+  }
+  showToast('✅ تم قبول الخطاب');
+  closeModal(); loadLetters();
+}
+
+async function updateLetter(id) {
+  const keys = ['client_name','client_phone','responsible','service','product_description',
+    'quantity','sale_price','shipped_to_account','shipped_from_account',
+    'experience_rating','notes','improvements'];
+  const updates = { updated_at: new Date().toISOString() };
+  keys.forEach(k => {
+    const el = document.getElementById(`edit_${k}_${id}`);
+    if (el) updates[k] = el.value.trim() || 'N/A';
+  });
+  try {
+    const { error } = await supabase.from('letters').update(updates).eq('id',id);
+    if (error) throw error;
+  } catch(e) {
+    const local = JSON.parse(localStorage.getItem('syk_letters')||'[]');
+    const idx = local.findIndex(x => x.id==id);
+    if (idx>-1) { Object.assign(local[idx], updates); localStorage.setItem('syk_letters',JSON.stringify(local)); }
+  }
+  showToast('✅ تم حفظ التعديلات');
+  closeModal(); loadLetters();
+}
+
+async function deleteLetter(id) {
+  if (!confirm('تأكيد الحذف؟ سيُنقل لسلة المهملات ويُحذف نهائياً بعد 30 يوم.')) return;
+  const deletedAt = new Date().toISOString();
+  try {
+    const { error } = await supabase.from('letters')
+      .update({ status: 'trash', deleted_at: deletedAt })
+      .eq('id', id);
+    if (error) throw error;
+  } catch(e) {
+    const local = JSON.parse(localStorage.getItem('syk_letters')||'[]');
+    const idx = local.findIndex(x=>x.id==id);
+    if (idx>-1) { local[idx].status='trash'; local[idx].deleted_at=deletedAt; localStorage.setItem('syk_letters',JSON.stringify(local)); }
+  }
+  showToast('🗑️ نُقل لسلة المهملات');
+  closeModal(); loadLetters();
+}
+
+// ── سلة المهملات ──────────────────────────────
+let trashLetters = [];
+async function loadTrash() {
+  const grid = document.getElementById('trashGrid');
+  grid.innerHTML = '<div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">جاري التحميل...</div>';
+
+  // حذف نهائي لما تجاوز 30 يوم
+  await purgeOldTrash();
+
+  try {
+    const { data, error } = await supabase.from('letters')
+      .select('*').eq('status','trash').order('deleted_at',{ascending:false});
+    if (error) throw error;
+    trashLetters = data || [];
+  } catch(e) {
+    trashLetters = JSON.parse(localStorage.getItem('syk_letters')||'[]')
+      .filter(l=>l.status==='trash');
+  }
+
+  if (!trashLetters.length) {
+    grid.innerHTML = '<div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">سلة المهملات فارغة</div>';
+    return;
+  }
+
+  grid.innerHTML = trashLetters.map(l => {
+    const deletedDate = new Date(l.deleted_at || l.updated_at);
+    const daysLeft = 30 - Math.floor((Date.now() - deletedDate.getTime()) / 86400000);
+    return `<div class="trash-card">
+      <div class="lc-number">${l.letter_number}</div>
+      <div style="font-size:.82rem;color:var(--text-muted)">${l.client_name}</div>
+      <div class="lc-date">حُذف: ${deletedDate.toLocaleDateString('ar-SA')}</div>
+      <div class="days-left">يُحذف نهائياً بعد ${daysLeft} يوم</div>
+      <div style="display:flex;gap:6px;justify-content:center;margin-top:8px">
+        <button class="restore-btn" onclick="restoreLetter('${l.id}')">↩️ استرجاع</button>
+        <button class="restore-btn" style="border-color:#888;color:#888" onclick="permanentDelete('${l.id}')">حذف نهائي</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function purgeOldTrash() {
+  const thirtyDaysAgo = new Date(Date.now() - 30*24*60*60*1000).toISOString();
+  try {
+    await supabase.from('letters').delete()
+      .eq('status','trash').lt('deleted_at', thirtyDaysAgo);
+  } catch(e) {
+    // localStorage
+    const local = JSON.parse(localStorage.getItem('syk_letters')||'[]');
+    const filtered = local.filter(l => {
+      if (l.status !== 'trash') return true;
+      const d = new Date(l.deleted_at||0);
+      return (Date.now() - d.getTime()) < 30*24*60*60*1000;
+    });
+    localStorage.setItem('syk_letters', JSON.stringify(filtered));
+  }
+}
+
+async function restoreLetter(id) {
+  try {
+    const { error } = await supabase.from('letters')
+      .update({ status:'pending', deleted_at:null }).eq('id',id);
+    if (error) throw error;
+  } catch(e) {
+    const local = JSON.parse(localStorage.getItem('syk_letters')||'[]');
+    const idx = local.findIndex(x=>x.id==id);
+    if (idx>-1) { local[idx].status='pending'; delete local[idx].deleted_at; localStorage.setItem('syk_letters',JSON.stringify(local)); }
+  }
+  showToast('✅ تم استرجاع الخطاب');
+  loadTrash();
+}
+
+async function permanentDelete(id) {
+  if (!confirm('حذف نهائي ولا يمكن استرجاعه؟')) return;
+  try {
+    const { error } = await supabase.from('letters').delete().eq('id',id);
+    if (error) throw error;
+  } catch(e) {
+    const local = JSON.parse(localStorage.getItem('syk_letters')||'[]');
+    localStorage.setItem('syk_letters',JSON.stringify(local.filter(x=>x.id!=id)));
+  }
+  showToast('🗑️ تم الحذف النهائي');
+  loadTrash();
+}
+
+async function redownloadPDF(id) {
+  const l = allLetters.find(x=>x.id==id); if(!l) return;
+  showToast('⏳ جاري تجهيز PDF...');
+  try {
+    let receiptDataUrl = localStorage.getItem('receipt_'+l.letter_number) || null;
+    if (!receiptDataUrl && l.receipt_url) {
+      try {
+        const res = await fetch(l.receipt_url);
+        const blob = await res.blob();
+        receiptDataUrl = await new Promise(r=>{const fr=new FileReader();fr.onload=e=>r(e.target.result);fr.readAsDataURL(blob);});
+      } catch(e) {}
+    }
+    await generateLetterPDF(l, receiptDataUrl);
+    showToast('✅ تم تنزيل PDF');
+  } catch(e) {
+    showToast('⚠️ فشل توليد PDF', true);
+  }
+}
+
+function closeModal() { document.getElementById('editModal').classList.remove('active'); }
+document.getElementById('editModal').addEventListener('click', e => { if(e.target.id==='editModal') closeModal(); });
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+function showToast(msg, err=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = err ? 'var(--danger)' : 'var(--success)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
