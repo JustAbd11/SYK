@@ -121,22 +121,28 @@
           </div>
           <input type="hidden" id="f_operation" value="تم البيع">
         </div>
-        <div class="form-group"><label>الخدمة</label><input type="text" id="f_service" placeholder="نوع الخدمة"></div>
-        <!-- وصف المنتج — يتغير حسب النوع -->
+        <!-- الخدمة — قائمة ديناميكية -->
         <div class="form-group" id="desc_normal">
-          <label>وصف المنتج</label>
-          <input type="text" id="f_product_description" placeholder="وصف المنتج الرقمي">
+          <label>الخدمة</label>
+          <input type="text" id="f_service" placeholder="نوع الخدمة">
         </div>
         <div class="form-group" id="desc_st" style="display:none">
-          <label>وصف المنتج (ST)</label>
-          <div class="st-product-list">
-            <div class="st-product-btn" onclick="selectSTProduct('فليكس 150')">فليكس 150</div>
-            <div class="st-product-btn" onclick="selectSTProduct('فليكس 100')">فليكس 100</div>
-            <div class="st-product-btn" onclick="selectSTProduct('فليكس 65')">فليكس 65</div>
-          </div>
-          <input type="hidden" id="f_product_st" value="">
-          <div id="st_selected" style="margin-top:8px;font-size:.85rem;color:var(--gold)"></div>
+          <label>الخدمة</label>
+          <select id="f_service_st" onchange="onSTServiceChange()">
+            <option value="">اختر الخدمة</option>
+            <option value="فليكس">فليكس</option>
+            <option value="سوا">سوا</option>
+          </select>
         </div>
+        <!-- وصف المنتج — يظهر بعد اختيار الخدمة -->
+        <div class="form-group" id="desc_product_st" style="display:none">
+          <label>وصف المنتج</label>
+          <select id="f_product_st_select" onchange="document.getElementById('f_product_st').value=this.value">
+            <option value="">اختر</option>
+          </select>
+          <input type="hidden" id="f_product_st" value="">
+        </div>
+        <input type="hidden" id="f_product_description" value="">
         <div class="form-group full">
           <label>تم الشحن المباشر للحساب (العميل)</label>
           <input type="text" id="f_shipped_to" placeholder="رقم / اسم حساب العميل">
@@ -254,6 +260,25 @@
         <select id="fin_year" onchange="renderFinance()">
           <script>for(let y=new Date().getFullYear();y>=2026;y--)document.write(`<option value="${y}">${y}</option>`)</script>
         </select>
+        <select id="fin_service" onchange="renderFinance()">
+          <option value="">كل الخدمات</option>
+          <option value="فليكس">فليكس</option>
+          <option value="سوا">سوا</option>
+        </select>
+        <select id="fin_product" onchange="renderFinance()">
+          <option value="">كل المنتجات</option>
+          <optgroup label="فليكس">
+            <option value="فليكس 150">فليكس 150</option>
+            <option value="فليكس 100">فليكس 100</option>
+            <option value="فليكس 65">فليكس 65</option>
+          </optgroup>
+          <optgroup label="سوا">
+            <option value="بوست بلس">بوست بلس</option>
+            <option value="سوا 175">سوا 175</option>
+            <option value="لايك بلس">لايك بلس</option>
+            <option value="شير بلس">شير بلس</option>
+          </optgroup>
+        </select>
         <button class="export-btn" onclick="exportFinanceExcel()">📥 تصدير Excel</button>
         <button class="btn btn-outline" onclick="loadFinance()">🔄 تحديث</button>
       </div>
@@ -277,7 +302,7 @@
         <div style="overflow-x:auto">
           <table class="finance-table" id="buyTable">
             <thead><tr>
-              <th>المنتج</th><th>الكمية</th><th>السعر</th><th>المجموع</th><th>التاريخ</th><th>من</th>
+              <th>المنتج</th><th>الكمية</th><th>السعر</th><th>المجموع</th>
             </tr></thead>
             <tbody id="buyTableBody"></tbody>
             <tfoot><tr class="total-row" id="buyTotalRow"></tr></tfoot>
@@ -294,7 +319,7 @@
         <div style="overflow-x:auto">
           <table class="finance-table" id="sellTable">
             <thead><tr>
-              <th>المنتج</th><th>الكمية</th><th>السعر</th><th>المجموع</th><th>التاريخ</th><th>من</th>
+              <th>المنتج</th><th>الكمية</th><th>السعر</th><th>المجموع</th>
             </tr></thead>
             <tbody id="sellTableBody"></tbody>
             <tfoot><tr class="total-row" id="sellTotalRow"></tr></tfoot>
@@ -378,11 +403,38 @@ let currentLetterNum = null;
 
 function onTypeChange(){
   const type = document.getElementById('f_type').value;
-  // إظهار/إخفاء وصف ST
-  document.getElementById('desc_normal').style.display = type==='ST' ? 'none' : '';
-  document.getElementById('desc_st').style.display     = type==='ST' ? ''     : 'none';
+  const isST = type === 'ST';
+  document.getElementById('desc_normal').style.display      = isST ? 'none' : '';
+  document.getElementById('desc_st').style.display          = isST ? ''     : 'none';
+  document.getElementById('desc_product_st').style.display  = 'none';
+  document.getElementById('f_product_st').value = '';
+  document.getElementById('f_product_description').value = '';
+  if(document.getElementById('f_service_st')) document.getElementById('f_service_st').value='';
   if(type) fetchNextNumber();
   else { document.getElementById('autoLetterNum').textContent='اختر النوع'; currentLetterNum=null; }
+}
+
+function onSTServiceChange(){
+  const svc = document.getElementById('f_service_st').value;
+  const prodDiv = document.getElementById('desc_product_st');
+  const prodSel = document.getElementById('f_product_st_select');
+  if(!svc){ prodDiv.style.display='none'; return; }
+  prodDiv.style.display='';
+  prodSel.innerHTML='<option value="">اختر</option>';
+  const opts = svc==='فليكس'
+    ? ['فليكس 150','فليكس 100','فليكس 65']
+    : ['بوست بلس','سوا 175','لايك بلس','شير بلس'];
+  opts.forEach(o=>{
+    const el=document.createElement('option');
+    el.value=o; el.textContent=o;
+    prodSel.appendChild(el);
+  });
+  document.getElementById('f_product_st').value='';
+  document.getElementById('f_product_description').value='';
+  prodSel.onchange=()=>{
+    document.getElementById('f_product_st').value=prodSel.value;
+    document.getElementById('f_product_description').value=prodSel.value;
+  };
 }
 
 async function fetchNextNumber(){
@@ -417,13 +469,7 @@ function selectOp(op){
   document.getElementById('f_operation').value = op==='sale'?'تم البيع':'تم الشراء';
 }
 
-// ══ منتجات ST ══════════════════════════════════════════════════
-function selectSTProduct(name){
-  document.querySelectorAll('.st-product-btn').forEach(b=>b.classList.remove('selected'));
-  event.target.classList.add('selected');
-  document.getElementById('f_product_st').value = name;
-  document.getElementById('st_selected').textContent = '✅ ' + name;
-}
+
 
 // ══ FORM ══════════════════════════════════════════════════════
 let receiptDataURL = null;
@@ -444,13 +490,15 @@ async function saveLetter(btn){
   if(btn){ btn.disabled=true; btn.textContent='⏳ جاري الحفظ...'; }
   const {prefix,type,year}=currentLetterNum;
   const letterNum=`${prefix}-${type}-${year}`;
-  const productDesc = type==='ST' ? (document.getElementById('f_product_st').value||'N/A') : val('f_product_description');
+  const isST = type==='ST';
+  const serviceVal = isST ? (document.getElementById('f_service_st')?.value||'N/A') : val('f_service');
+  const productDesc = isST ? (document.getElementById('f_product_st').value||'N/A') : val('f_product_description');
   const data={
     letter_number:letterNum, letter_prefix:prefix, letter_type:type, letter_year:year,
     sender:CURRENT_DISPLAY, status:'pending',
     operation:val('f_operation'),
     client_name:val('f_client_name'), client_phone:val('f_client_phone'), responsible:val('f_responsible'),
-    service:val('f_service'), product_description:productDesc,
+    service:serviceVal, product_description:productDesc,
     quantity:val('f_quantity'), sale_price:val('f_sale_price'),
     shipped_to_account:val('f_shipped_to'), shipped_from_account:val('f_shipped_from'),
     experience_rating:val('f_rating'), notes:val('f_notes'), improvements:val('f_improvements'),
@@ -483,8 +531,9 @@ function resetForm(){
   document.getElementById('f_type').value='';
   document.getElementById('f_shipped_from').value='';
   document.getElementById('f_product_st').value='';
-  document.getElementById('st_selected').textContent='';
-  document.querySelectorAll('.st-product-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('f_product_description').value='';
+  if(document.getElementById('f_service_st')) document.getElementById('f_service_st').value='';
+  document.getElementById('desc_product_st').style.display='none';
   document.getElementById('desc_normal').style.display='';
   document.getElementById('desc_st').style.display='none';
   document.getElementById('autoLetterNum').textContent='اختر النوع';
@@ -640,53 +689,67 @@ async function loadFinance(){
 }
 
 function renderFinance(){
-  const month = document.getElementById('fin_month').value;
-  const year  = document.getElementById('fin_year').value;
+  const month   = document.getElementById('fin_month').value;
+  const year    = document.getElementById('fin_year').value;
+  const service = document.getElementById('fin_service').value;
+  const product = document.getElementById('fin_product').value;
 
   let filtered = financeData.filter(l=>{
     const d=new Date(l.created_at);
-    return(!month||String(d.getMonth()+1).padStart(2,'0')===month)
-      &&(!year||String(d.getFullYear())===year);
+    const matchMonth = !month || String(d.getMonth()+1).padStart(2,'0')===month;
+    const matchYear  = !year  || String(d.getFullYear())===year;
+    const matchSvc   = !service || l.service===service;
+    const matchProd  = !product || l.product_description===product;
+    return matchMonth && matchYear && matchSvc && matchProd;
   });
 
   const buyRows  = filtered.filter(l=>l.operation==='تم الشراء');
   const sellRows = filtered.filter(l=>l.operation==='تم البيع');
 
-  function calcTotal(row){
-    const qty  = parseFloat(row.quantity)  || 0;
-    const price= parseFloat(row.sale_price)|| 0;
-    return qty * price;
+  // دمج نفس المنتج في صف واحد
+  function mergeRows(rows){
+    const map={};
+    rows.forEach(r=>{
+      const key = r.product_description||'غير محدد';
+      const qty   = parseFloat(r.quantity)   || 0;
+      const price = parseFloat(r.sale_price) || 0;
+      if(!map[key]){ map[key]={ product:key, qty:0, price, total:0, count:0 }; }
+      map[key].qty   += qty;
+      map[key].total += qty * price;
+      map[key].count++;
+    });
+    return Object.values(map);
   }
 
-  function buildRows(rows, tbodyId){
-    const tbody=document.getElementById(tbodyId);
-    if(!rows.length){ tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:16px">لا توجد بيانات</td></tr>`; return 0; }
+  function buildMergedRows(rows, tbodyId, colorClass){
+    const merged = mergeRows(rows);
+    const tbody  = document.getElementById(tbodyId);
+    if(!merged.length){
+      tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px">لا توجد بيانات</td></tr>`;
+      return 0;
+    }
     let grandTotal=0;
-    tbody.innerHTML=rows.map(r=>{
-      const total=calcTotal(r); grandTotal+=total;
+    tbody.innerHTML=merged.map(r=>{
+      grandTotal+=r.total;
       return `<tr>
-        <td>${r.product_description||'—'}</td>
-        <td>${r.quantity||'—'}</td>
-        <td>${r.sale_price||'—'}</td>
-        <td style="font-weight:700;color:var(--gold)">${total.toLocaleString('ar-SA')} ر.س</td>
-        <td>${new Date(r.created_at).toLocaleDateString('ar-SA')}</td>
-        <td>${r.sender||'—'}</td>
+        <td>${r.product}</td>
+        <td>${r.qty}</td>
+        <td>${r.price} ر.س</td>
+        <td style="font-weight:700;color:${colorClass}">${r.total.toLocaleString('ar-SA')} ر.س</td>
       </tr>`;
     }).join('');
     return grandTotal;
   }
 
-  const buyTotal  = buildRows(buyRows,  'buyTableBody');
-  const sellTotal = buildRows(sellRows, 'sellTableBody');
+  const buyTotal  = buildMergedRows(buyRows,  'buyTableBody',  '#378add');
+  const sellTotal = buildMergedRows(sellRows, 'sellTableBody', '#27ae60');
 
-  // صفوف الإجمالي
-  document.getElementById('buyTotalRow').innerHTML  =`<td colspan="3">الإجمالي</td><td style="color:#378add;font-weight:700">${buyTotal.toLocaleString('ar-SA')} ر.س</td><td colspan="2">${buyRows.length} خطاب</td>`;
-  document.getElementById('sellTotalRow').innerHTML =`<td colspan="3">الإجمالي</td><td style="color:#27ae60;font-weight:700">${sellTotal.toLocaleString('ar-SA')} ر.س</td><td colspan="2">${sellRows.length} خطاب</td>`;
+  document.getElementById('buyTotalRow').innerHTML  =`<td colspan="3" style="font-weight:700">الإجمالي</td><td style="color:#378add;font-weight:700">${buyTotal.toLocaleString('ar-SA')} ر.س</td>`;
+  document.getElementById('sellTotalRow').innerHTML =`<td colspan="3" style="font-weight:700">الإجمالي</td><td style="color:#27ae60;font-weight:700">${sellTotal.toLocaleString('ar-SA')} ر.س</td>`;
 
   document.getElementById('buy_count').textContent  = `${buyRows.length} خطاب`;
   document.getElementById('sell_count').textContent = `${sellRows.length} خطاب`;
 
-  // ملخص
   const profit = sellTotal - buyTotal;
   document.getElementById('sum_sell_total').textContent = sellTotal.toLocaleString('ar-SA') + ' ر.س';
   document.getElementById('sum_buy_total').textContent  = buyTotal.toLocaleString('ar-SA')  + ' ر.س';
@@ -706,24 +769,22 @@ function exportFinanceExcel(){
       &&(!year||String(d.getFullYear())===year);
   });
 
-  function toRows(rows){
-    return rows.map(r=>{
+  // دمج نفس المنتج للإكسل أيضاً
+  function toMergedRows(rows){
+    const map={};
+    rows.forEach(r=>{
+      const key=r.product_description||'غير محدد';
       const qty=parseFloat(r.quantity)||0, price=parseFloat(r.sale_price)||0;
-      return{
-        'رقم الخطاب':r.letter_number,
-        'المنتج':r.product_description,
-        'الكمية':qty,
-        'السعر':price,
-        'المجموع':qty*price,
-        'المرسل':r.sender,
-        'التاريخ':new Date(r.created_at).toLocaleDateString('ar-SA'),
-      };
+      if(!map[key]) map[key]={'المنتج':key,'الكمية':0,'السعر':price,'المجموع':0};
+      map[key]['الكمية']+=qty;
+      map[key]['المجموع']+=qty*price;
     });
+    return Object.values(map);
   }
 
   const wb = XLSX.utils.book_new();
-  const buySheet  = XLSX.utils.json_to_sheet(toRows(filtered.filter(l=>l.operation==='تم الشراء')));
-  const sellSheet = XLSX.utils.json_to_sheet(toRows(filtered.filter(l=>l.operation==='تم البيع')));
+  const buySheet  = XLSX.utils.json_to_sheet(toMergedRows(filtered.filter(l=>l.operation==='تم الشراء')));
+  const sellSheet = XLSX.utils.json_to_sheet(toMergedRows(filtered.filter(l=>l.operation==='تم البيع')));
   XLSX.utils.book_append_sheet(wb, buySheet,  'الشراء - ST');
   XLSX.utils.book_append_sheet(wb, sellSheet, 'البيع - ST');
 
