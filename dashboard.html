@@ -260,24 +260,20 @@
         <select id="fin_year" onchange="renderFinance()">
           <script>for(let y=new Date().getFullYear();y>=2026;y--)document.write(`<option value="${y}">${y}</option>`)</script>
         </select>
-        <select id="fin_service" onchange="renderFinance()">
+        <select id="fin_type" onchange="onFinTypeChange()">
+          <option value="">كل الأنواع</option>
+          <option value="ST">ST</option>
+          <option value="LC">LC</option>
+          <option value="NO">NO</option>
+          <option value="AM">AM</option>
+        </select>
+        <select id="fin_service" onchange="onFinServiceChange()" style="display:none">
           <option value="">كل الخدمات</option>
           <option value="فليكس">فليكس</option>
           <option value="سوا">سوا</option>
         </select>
-        <select id="fin_product" onchange="renderFinance()">
+        <select id="fin_product" onchange="renderFinance()" style="display:none">
           <option value="">كل المنتجات</option>
-          <optgroup label="فليكس">
-            <option value="فليكس 150">فليكس 150</option>
-            <option value="فليكس 100">فليكس 100</option>
-            <option value="فليكس 65">فليكس 65</option>
-          </optgroup>
-          <optgroup label="سوا">
-            <option value="بوست بلس">بوست بلس</option>
-            <option value="سوا 175">سوا 175</option>
-            <option value="لايك بلس">لايك بلس</option>
-            <option value="شير بلس">شير بلس</option>
-          </optgroup>
         </select>
         <button class="export-btn" onclick="exportFinanceExcel()">📥 تصدير Excel</button>
         <button class="btn btn-outline" onclick="loadFinance()">🔄 تحديث</button>
@@ -679,11 +675,47 @@ let financeData = [];
 async function loadFinance(){
   try{
     const {data,error}=await supabase.from('letters').select('*')
-      .eq('letter_type','ST').eq('status','approved').order('created_at',{ascending:false});
+      .eq('status','approved').order('created_at',{ascending:false});
     if(error) throw error; financeData=data||[];
   }catch(e){
     financeData=JSON.parse(localStorage.getItem('syk_letters')||'[]')
-      .filter(l=>l.letter_type==='ST'&&l.status==='approved');
+      .filter(l=>l.status==='approved');
+  }
+  renderFinance();
+}
+
+// المنتجات لكل خدمة
+const ST_PRODUCTS = {
+  'فليكس': ['فليكس 150','فليكس 100','فليكس 65'],
+  'سوا':   ['بوست بلس','سوا 175','لايك بلس','شير بلس'],
+};
+
+function onFinTypeChange(){
+  const type = document.getElementById('fin_type').value;
+  const svcEl = document.getElementById('fin_service');
+  const prdEl = document.getElementById('fin_product');
+  // أعد تعيين
+  svcEl.value=''; prdEl.value='';
+  prdEl.innerHTML='<option value="">كل المنتجات</option>';
+  // ST فقط يظهر فلتر الخدمة
+  svcEl.style.display = type==='ST' ? '' : 'none';
+  prdEl.style.display = 'none';
+  renderFinance();
+}
+
+function onFinServiceChange(){
+  const svc = document.getElementById('fin_service').value;
+  const prdEl = document.getElementById('fin_product');
+  prdEl.innerHTML='<option value="">كل المنتجات</option>';
+  if(svc && ST_PRODUCTS[svc]){
+    ST_PRODUCTS[svc].forEach(p=>{
+      const o=document.createElement('option');
+      o.value=p; o.textContent=p;
+      prdEl.appendChild(o);
+    });
+    prdEl.style.display='';
+  } else {
+    prdEl.style.display='none';
   }
   renderFinance();
 }
@@ -691,16 +723,18 @@ async function loadFinance(){
 function renderFinance(){
   const month   = document.getElementById('fin_month').value;
   const year    = document.getElementById('fin_year').value;
+  const type    = document.getElementById('fin_type').value;
   const service = document.getElementById('fin_service').value;
   const product = document.getElementById('fin_product').value;
 
   let filtered = financeData.filter(l=>{
     const d=new Date(l.created_at);
-    const matchMonth = !month || String(d.getMonth()+1).padStart(2,'0')===month;
-    const matchYear  = !year  || String(d.getFullYear())===year;
+    const matchMonth = !month   || String(d.getMonth()+1).padStart(2,'0')===month;
+    const matchYear  = !year    || String(d.getFullYear())===year;
+    const matchType  = !type    || l.letter_type===type;
     const matchSvc   = !service || l.service===service;
     const matchProd  = !product || l.product_description===product;
-    return matchMonth && matchYear && matchSvc && matchProd;
+    return matchMonth && matchYear && matchType && matchSvc && matchProd;
   });
 
   const buyRows  = filtered.filter(l=>l.operation==='تم الشراء');
