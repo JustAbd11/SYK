@@ -95,6 +95,26 @@
     .rec-table tr:last-child td{border:none}
     .badge-up{background:#0a2a0a;color:#27ae60;padding:3px 10px;border-radius:10px;font-size:.72rem;font-weight:600}
     .badge-dn{background:#2a0a0a;color:#e74c3c;padding:3px 10px;border-radius:10px;font-size:.72rem;font-weight:600}
+    /* ══ تحليل البيانات ══ */
+    .analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:0}
+    @media(max-width:700px){.analysis-grid{grid-template-columns:1fr}}
+    .analysis-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+    .analysis-card-title{font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+    .analysis-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:.83rem}
+    .analysis-row:last-child{border:none}
+    .analysis-row .ar-label{color:var(--text-muted)}
+    .analysis-row .ar-val{font-weight:700;font-variant-numeric:tabular-nums}
+    .analysis-bar-wrap{margin-top:4px}
+    .analysis-bar-bg{background:var(--card2);border-radius:4px;height:6px;overflow:hidden;margin-top:6px}
+    .analysis-bar-fill{height:6px;border-radius:4px;transition:width .6s ease}
+    .analysis-badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:.72rem;font-weight:600;margin-right:4px}
+    .ab-green{background:#0a2a0a;color:#27ae60}
+    .ab-red{background:#2a0a0a;color:#e74c3c}
+    .ab-yellow{background:#2a1a00;color:#f0a500}
+    .ab-blue{background:#0a1a2a;color:#378add}
+    .trend-up{color:#27ae60;font-size:.8rem}
+    .trend-dn{color:#e74c3c;font-size:.8rem}
+    .trend-eq{color:#888;font-size:.8rem}
     /* ST product list */
     .st-product-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
     .st-product-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-muted);cursor:pointer;font-family:var(--font);font-size:.9rem;transition:all .2s}
@@ -542,6 +562,12 @@
       <div class="section-card" style="margin-bottom:0">
         <div class="section-title">💡 توصيات الإدارة</div>
         <div id="recommendations" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+
+      <!-- تحليل البيانات المفصل -->
+      <div class="section-card" style="margin-bottom:0">
+        <div class="section-title">🔬 تحليل البيانات المفصل</div>
+        <div class="analysis-grid" id="analysisSection"></div>
       </div>
 
     </div>
@@ -1322,11 +1348,9 @@ function buildRecommendations(sells,buys,pSQ,pBQ,pSA,pBA,profit,ts,tb,margin){
 
   if(profit>0)    recs.push({i:'✅',c:'#27ae60',t:`الوضع المالي إيجابي — صافي ربح ${profit.toLocaleString('ar-SA')} ر.س. استمر في نفس الاستراتيجية.`});
   else if(profit<0) recs.push({i:'⚠️',c:'#e74c3c',t:`تحذير: خسارة ${Math.abs(profit).toLocaleString('ar-SA')} ر.س. راجع أسعار البيع وقلل المشتريات.`});
-
   if(margin>=20)    recs.push({i:'💰',c:'#27ae60',t:`هامش الربح ${margin.toFixed(1)}% — ممتاز. حافظ على هذه النسبة.`});
   else if(margin>0) recs.push({i:'📊',c:'#e8722a',t:`هامش الربح ${margin.toFixed(1)}% — جيد. يمكن تحسينه برفع الأسعار أو خفض تكاليف الشراء.`});
   else if(margin<0) recs.push({i:'📉',c:'#e74c3c',t:`هامش الربح سلبي ${margin.toFixed(1)}% — خسارة في كل عملية. راجع التسعير فوراً.`});
-
   if(topS) recs.push({i:'🏆',c:'#e8722a',t:`المنتج الأكثر مبيعاً "${topS[0]}" بكمية ${topS[1]}. يُنصح بزيادة المخزون.`});
   if(topB&&topS&&topB[0]!==topS[0]) recs.push({i:'🛒',c:'#378add',t:`تشتري أكثر من "${topB[0]}" لكنه ليس الأكثر مبيعاً — راجع الحاجة الفعلية.`});
   if(worstS&&Object.keys(pSA).length>1) recs.push({i:'📉',c:'#888',t:`المنتج الأضعف مبيعاً "${worstS[0]}" — فكّر في تخفيض سعره أو تقليل شراؤه.`});
@@ -1336,6 +1360,156 @@ function buildRecommendations(sells,buys,pSQ,pBQ,pSA,pBA,profit,ts,tb,margin){
       <span style="font-size:1.1rem;flex-shrink:0">${r.i}</span>
       <span style="font-size:.85rem;color:var(--text);line-height:1.7">${r.t}</span>
     </div>`).join('')||'<div style="color:var(--text-muted);font-size:.85rem;padding:8px">لا توجد بيانات كافية.</div>';
+
+  // بناء التحليل المفصل
+  buildDetailedAnalysis(sells,buys,pSQ,pBQ,pSA,pBA,profit,ts,tb,margin);
+}
+
+function buildDetailedAnalysis(sells,buys,pSQ,pBQ,pSA,pBA,profit,ts,tb,margin){
+  const allP=[...new Set([...Object.keys(pSA),...Object.keys(pBA)])];
+  const totalQtySell=Object.values(pSQ).reduce((s,v)=>s+v,0);
+  const totalQtyBuy=Object.values(pBQ).reduce((s,v)=>s+v,0);
+  const avgSellPrice=totalQtySell>0?ts/totalQtySell:0;
+  const avgBuyPrice=totalQtyBuy>0?tb/totalQtyBuy:0;
+  const roi=tb>0?((profit/tb)*100):0;
+  const breakEven=tb>0&&margin>0?(tb/(margin/100)):0;
+
+  function bar(val,max,color){
+    const pct=max>0?Math.min((val/max)*100,100):0;
+    return`<div class="analysis-bar-bg"><div class="analysis-bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
+  }
+  function badge(txt,cls){return`<span class="analysis-badge ${cls}">${txt}</span>`;}
+  function trend(v){return v>0?`<span class="trend-up">▲ ${v.toFixed(1)}%</span>`:v<0?`<span class="trend-dn">▼ ${Math.abs(v).toFixed(1)}%</span>`:`<span class="trend-eq">─ مستقر</span>`;}
+  function fmt(n){return Number(n).toLocaleString('ar-SA');}
+
+  const maxSellAmt=Math.max(...allP.map(p=>pSA[p]||0),1);
+  const maxBuyAmt=Math.max(...allP.map(p=>pBA[p]||0),1);
+  const maxSellQty=Math.max(...allP.map(p=>pSQ[p]||0),1);
+
+  // ── بطاقة 1: ملخص مالي شامل ──
+  const card1=`<div class="analysis-card">
+    <div class="analysis-card-title">💼 الملخص المالي الشامل</div>
+    <div class="analysis-row"><span class="ar-label">إجمالي الإيرادات</span><span class="ar-val" style="color:#27ae60">${fmt(ts)} ر.س</span></div>
+    <div class="analysis-row"><span class="ar-label">إجمالي التكاليف</span><span class="ar-val" style="color:#e74c3c">${fmt(tb)} ر.س</span></div>
+    <div class="analysis-row"><span class="ar-label">صافي الربح</span><span class="ar-val" style="${profit>=0?'color:#27ae60':'color:#e74c3c'}">${profit>=0?'+':''}${fmt(profit)} ر.س</span></div>
+    <div class="analysis-row"><span class="ar-label">هامش الربح الصافي</span><span class="ar-val">${margin.toFixed(2)}% ${badge(margin>=20?'ممتاز':margin>=10?'جيد':margin>=0?'مقبول':'خسارة',margin>=20?'ab-green':margin>=10?'ab-blue':margin>=0?'ab-yellow':'ab-red')}</span></div>
+    <div class="analysis-row"><span class="ar-label">العائد على الاستثمار (ROI)</span><span class="ar-val" style="${roi>=0?'color:#27ae60':'color:#e74c3c'}">${roi.toFixed(2)}%</span></div>
+    <div class="analysis-row"><span class="ar-label">نقطة التعادل</span><span class="ar-val" style="color:var(--gold)">${breakEven>0?fmt(Math.round(breakEven))+' ر.س':'—'}</span></div>
+    <div class="analysis-row"><span class="ar-label">نسبة البيع/الشراء</span><span class="ar-val">${tb>0?(ts/tb).toFixed(2)+'x':'—'}</span></div>
+  </div>`;
+
+  // ── بطاقة 2: تحليل الكميات ──
+  const card2=`<div class="analysis-card">
+    <div class="analysis-card-title">📦 تحليل الكميات</div>
+    <div class="analysis-row"><span class="ar-label">إجمالي وحدات البيع</span><span class="ar-val" style="color:#27ae60">${fmt(totalQtySell)} وحدة</span></div>
+    <div class="analysis-row"><span class="ar-label">إجمالي وحدات الشراء</span><span class="ar-val" style="color:#378add">${fmt(totalQtyBuy)} وحدة</span></div>
+    <div class="analysis-row"><span class="ar-label">متوسط سعر البيع/وحدة</span><span class="ar-val">${fmt(Math.round(avgSellPrice))} ر.س</span></div>
+    <div class="analysis-row"><span class="ar-label">متوسط سعر الشراء/وحدة</span><span class="ar-val">${fmt(Math.round(avgBuyPrice))} ر.س</span></div>
+    <div class="analysis-row"><span class="ar-label">هامش السعر/وحدة</span><span class="ar-val" style="${avgSellPrice>avgBuyPrice?'color:#27ae60':'color:#e74c3c'}">${fmt(Math.round(avgSellPrice-avgBuyPrice))} ر.س</span></div>
+    <div class="analysis-row"><span class="ar-label">عدد أنواع المنتجات</span><span class="ar-val" style="color:var(--gold)">${allP.length} منتج</span></div>
+    <div class="analysis-row"><span class="ar-label">عدد الخطابات</span><span class="ar-val" style="color:#378add">${sells.length+buys.length} خطاب</span></div>
+  </div>`;
+
+  // ── بطاقة 3: أداء كل منتج مفصل ──
+  const prodRows=allP.map(p=>{
+    const sa=pSA[p]||0, ba=pBA[p]||0, sq=pSQ[p]||0, bq=pBQ[p]||0;
+    const prf=sa-ba, mg=sa>0?((prf/sa)*100):0;
+    const share=ts>0?((sa/ts)*100).toFixed(1):0;
+    return`<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:.85rem;font-weight:700;color:var(--text)">${p}</span>
+        <span>${badge(prf>=0?'ربح':'خسارة',prf>=0?'ab-green':'ab-red')}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.78rem;color:var(--text-muted);margin-bottom:8px">
+        <span>بيع: <b style="color:#27ae60">${fmt(sa)} ر.س (${sq} وحدة)</b></span>
+        <span>شراء: <b style="color:#378add">${fmt(ba)} ر.س (${bq} وحدة)</b></span>
+        <span>الربح: <b style="${prf>=0?'color:#27ae60':'color:#e74c3c'}">${prf>=0?'+':''}${fmt(prf)} ر.س</b></span>
+        <span>الهامش: <b style="${mg>=0?'color:#27ae60':'color:#e74c3c'}">${mg.toFixed(1)}%</b></span>
+      </div>
+      <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:4px">حصة من المبيعات: ${share}%</div>
+      ${bar(sa,maxSellAmt,'rgba(39,174,96,.7)')}
+    </div>`;
+  }).join('');
+
+  const card3=`<div class="analysis-card" style="grid-column:1/-1">
+    <div class="analysis-card-title">📊 أداء كل منتج بالتفصيل</div>
+    ${prodRows||'<div style="color:var(--text-muted);font-size:.85rem">لا توجد بيانات.</div>'}
+  </div>`;
+
+  // ── بطاقة 4: تصنيف المنتجات (مصفوفة BCG مبسطة) ──
+  const sortedBySell=allP.slice().sort((a,b)=>(pSA[b]||0)-(pSA[a]||0));
+  const halfLen=Math.ceil(sortedBySell.length/2);
+  const stars=sortedBySell.slice(0,halfLen);
+  const dogs=sortedBySell.slice(halfLen);
+
+  const card4=`<div class="analysis-card">
+    <div class="analysis-card-title">🎯 تصنيف المنتجات</div>
+    ${stars.length?`<div style="margin-bottom:12px">
+      <div style="font-size:.8rem;font-weight:700;color:#27ae60;margin-bottom:8px">⭐ منتجات النجوم (الأعلى مبيعاً)</div>
+      ${stars.map(p=>`<div class="analysis-row">
+        <span class="ar-label">${p}</span>
+        <span class="ar-val" style="color:#27ae60">${fmt(pSA[p]||0)} ر.س</span>
+      </div>`).join('')}
+    </div>`:''}
+    ${dogs.length?`<div>
+      <div style="font-size:.8rem;font-weight:700;color:#e74c3c;margin-bottom:8px">📉 منتجات تحتاج مراجعة</div>
+      ${dogs.map(p=>`<div class="analysis-row">
+        <span class="ar-label">${p}</span>
+        <span class="ar-val" style="color:#e74c3c">${fmt(pSA[p]||0)} ر.س</span>
+      </div>`).join('')}
+    </div>`:''}
+    ${!allP.length?'<div style="color:var(--text-muted);font-size:.85rem">لا توجد بيانات.</div>':''}
+  </div>`;
+
+  // ── بطاقة 5: تحليل الكميات بالرسم ──
+  const card5=`<div class="analysis-card">
+    <div class="analysis-card-title">📈 توزيع الكميات بالمنتج</div>
+    ${allP.map(p=>{
+      const sq=pSQ[p]||0, bq=pBQ[p]||0;
+      return`<div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px">
+          <span style="color:var(--text)">${p}</span>
+          <span style="color:var(--text-muted)">بيع: ${sq} | شراء: ${bq}</span>
+        </div>
+        <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:3px">البيع</div>
+        ${bar(sq,maxSellQty,'rgba(39,174,96,.8)')}
+        <div style="font-size:.72rem;color:var(--text-muted);margin:3px 0">الشراء</div>
+        ${bar(bq,maxSellQty,'rgba(55,138,221,.8)')}
+      </div>`;
+    }).join('')||'<div style="color:var(--text-muted);font-size:.85rem">لا توجد بيانات.</div>'}
+  </div>`;
+
+  // ── بطاقة 6: مؤشرات الأداء الرئيسية المتقدمة ──
+  const avgPerLetter = (sells.length+buys.length)>0 ? profit/(sells.length+buys.length) : 0;
+  const sellConcentration = allP.length>0 && ts>0 ? ((pSA[sortedBySell[0]]||0)/ts*100) : 0;
+  const efficiencyScore = Math.min(100, Math.max(0, margin*2 + (roi>0?20:0) + (profit>0?20:0)));
+
+  const card6=`<div class="analysis-card" style="grid-column:1/-1">
+    <div class="analysis-card-title">🏅 مؤشرات الأداء المتقدمة</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+      <div style="text-align:center;background:var(--card2);border-radius:10px;padding:16px">
+        <div style="font-size:1.5rem;font-weight:700;color:${efficiencyScore>=60?'#27ae60':efficiencyScore>=40?'#f0a500':'#e74c3c'}">${efficiencyScore.toFixed(0)}</div>
+        <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px">نقاط الأداء / 100</div>
+        <div style="margin-top:8px">${badge(efficiencyScore>=60?'ممتاز':efficiencyScore>=40?'متوسط':'ضعيف',efficiencyScore>=60?'ab-green':efficiencyScore>=40?'ab-yellow':'ab-red')}</div>
+      </div>
+      <div style="text-align:center;background:var(--card2);border-radius:10px;padding:16px">
+        <div style="font-size:1.5rem;font-weight:700;color:var(--gold)">${avgPerLetter>=0?'+':''}${fmt(Math.round(avgPerLetter))}</div>
+        <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px">متوسط الربح / خطاب (ر.س)</div>
+      </div>
+      <div style="text-align:center;background:var(--card2);border-radius:10px;padding:16px">
+        <div style="font-size:1.5rem;font-weight:700;color:#378add">${sellConcentration.toFixed(1)}%</div>
+        <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px">تركيز المنتج الأول</div>
+        <div style="margin-top:8px">${badge(sellConcentration>70?'تركيز عالي':sellConcentration>40?'معتدل':'موزع',sellConcentration>70?'ab-yellow':sellConcentration>40?'ab-blue':'ab-green')}</div>
+      </div>
+      <div style="text-align:center;background:var(--card2);border-radius:10px;padding:16px">
+        <div style="font-size:1.5rem;font-weight:700;color:#27ae60">${roi.toFixed(1)}%</div>
+        <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px">العائد على الاستثمار</div>
+        <div style="margin-top:8px">${badge(roi>=30?'ممتاز':roi>=10?'جيد':roi>=0?'مقبول':'سلبي',roi>=30?'ab-green':roi>=10?'ab-blue':roi>=0?'ab-yellow':'ab-red')}</div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('analysisSection').innerHTML = card1+card2+card3+card4+card5+card6;
 }
 
 // المقارنة بين فترتين
