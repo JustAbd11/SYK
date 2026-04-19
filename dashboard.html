@@ -59,37 +59,42 @@
     .export-btn{background:var(--gold);color:#000;border:none;border-radius:7px;padding:8px 18px;font-family:var(--font);font-size:.88rem;font-weight:700;cursor:pointer;transition:opacity .2s}
     .export-btn:hover{opacity:.85}
     /* ══ الجدول التفاعلي ══ */
-    .ch-wrap{display:flex;flex-direction:column;gap:20px}
-    .ch-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px}
-    .ch-toolbar select,.ch-toolbar input{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);padding:8px 12px;font-size:.85rem;outline:none;min-width:110px}
+    .ch-wrap{display:flex;flex-direction:column;gap:18px}
+    .ch-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
+    .ch-toolbar select{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);padding:8px 12px;font-size:.85rem;outline:none;min-width:110px}
     .ch-toolbar select:focus{border-color:var(--gold)}
-    .ch-toolbar .sep{flex:1}
     .ch-period-btns{display:flex;gap:4px}
-    .ch-period-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-muted);cursor:pointer;font-family:var(--font);font-size:.82rem;transition:all .2s}
+    .ch-period-btn{padding:7px 16px;border-radius:7px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-muted);cursor:pointer;font-family:var(--font);font-size:.82rem;font-weight:500;transition:all .2s}
     .ch-period-btn.active{background:var(--gold);color:#000;font-weight:700;border-color:var(--gold)}
-    .ch-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-    @media(max-width:800px){.ch-kpis{grid-template-columns:repeat(3,1fr)}}
+    .ch-period-lbl{font-size:.72rem;color:var(--text-muted);font-weight:400;margin-right:6px}
+    .cmp-sel{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);padding:8px 12px;font-size:.85rem;outline:none}
+    .cmp-sel:focus{border-color:var(--gold)}
+    /* KPIs */
+    .ch-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+    @media(max-width:1000px){.ch-kpis{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:500px){.ch-kpis{grid-template-columns:repeat(2,1fr)}}
-    .kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 12px;text-align:center}
-    .kpi-val{font-size:1.25rem;font-weight:700;margin-bottom:3px}
-    .kpi-lbl{font-size:.75rem;color:var(--text-muted)}
-    .kpi-sub{font-size:.72rem;margin-top:3px}
-    .ch-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;transition:transform .15s}
+    .kpi:hover{transform:translateY(-2px);border-color:var(--gold)}
+    .kpi-icon{font-size:1.4rem;margin-bottom:6px}
+    .kpi-val{font-size:1.15rem;font-weight:700;margin-bottom:4px;font-variant-numeric:tabular-nums}
+    .kpi-lbl{font-size:.72rem;color:var(--text-muted);line-height:1.3}
+    /* Grid */
+    .ch-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     @media(max-width:700px){.ch-grid{grid-template-columns:1fr}}
     .ch-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
     .ch-card.wide{grid-column:1/-1}
-    .ch-card-hdr{font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
-    .ch-card canvas{max-height:240px}
-    .ch-cmp{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-    @media(max-width:700px){.ch-cmp{grid-template-columns:1fr}}
-    .cmp-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
-    .cmp-hdr{font-size:.82rem;font-weight:700;color:var(--text-muted);margin-bottom:10px}
+    .ch-card-hdr{font-size:.85rem;font-weight:700;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+    .ch-card canvas{max-height:220px}
+    /* جدول */
+    .cmp-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px}
+    .cmp-hdr{font-size:.8rem;font-weight:700;color:var(--text-muted);margin-bottom:8px}
     .rec-table{width:100%;border-collapse:collapse;font-size:.82rem}
-    .rec-table th{background:var(--card2);color:var(--text-muted);padding:6px 10px;text-align:right;font-weight:600;font-size:.78rem}
-    .rec-table td{padding:6px 10px;border-bottom:1px solid var(--border);text-align:right}
+    .rec-table th{background:var(--card2);color:var(--text-muted);padding:8px 12px;text-align:right;font-weight:600;font-size:.78rem;border-bottom:2px solid var(--border)}
+    .rec-table td{padding:8px 12px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums}
+    .rec-table tr:hover td{background:var(--card2)}
     .rec-table tr:last-child td{border:none}
-    .badge-up{background:#0a2a0a;color:#27ae60;padding:2px 8px;border-radius:10px;font-size:.72rem}
-    .badge-dn{background:#2a0a0a;color:#e74c3c;padding:2px 8px;border-radius:10px;font-size:.72rem}
+    .badge-up{background:#0a2a0a;color:#27ae60;padding:3px 10px;border-radius:10px;font-size:.72rem;font-weight:600}
+    .badge-dn{background:#2a0a0a;color:#e74c3c;padding:3px 10px;border-radius:10px;font-size:.72rem;font-weight:600}
     /* ST product list */
     .st-product-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
     .st-product-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text-muted);cursor:pointer;font-family:var(--font);font-size:.9rem;transition:all .2s}
@@ -362,12 +367,52 @@
   <div class="tab-content" id="tab-charts">
     <div class="ch-wrap">
 
+      <!-- المقارنة في الأعلى -->
+      <div class="section-card" style="margin-bottom:0">
+        <div class="section-title">⚖️ المقارنة بين فترتين</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:.75rem;color:var(--text-muted);font-weight:600">الفترة الأولى</label>
+            <div style="display:flex;gap:6px">
+              <select id="cmp_y1" class="cmp-sel">
+                <script>for(let y=new Date().getFullYear();y>=2026;y--)document.write(`<option value="${y}">${y}</option>`)</script>
+              </select>
+              <select id="cmp_m1" class="cmp-sel">
+                <option value="">السنة كاملة</option>
+                <option value="0">يناير</option><option value="1">فبراير</option><option value="2">مارس</option>
+                <option value="3">أبريل</option><option value="4">مايو</option><option value="5">يونيو</option>
+                <option value="6">يوليو</option><option value="7">أغسطس</option><option value="8">سبتمبر</option>
+                <option value="9">أكتوبر</option><option value="10">نوفمبر</option><option value="11">ديسمبر</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size:1.3rem;color:var(--border);padding-bottom:6px">⟷</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:.75rem;color:var(--text-muted);font-weight:600">الفترة الثانية</label>
+            <div style="display:flex;gap:6px">
+              <select id="cmp_y2" class="cmp-sel">
+                <script>for(let y=new Date().getFullYear();y>=2026;y--)document.write(`<option value="${y}">${y}</option>`)</script>
+              </select>
+              <select id="cmp_m2" class="cmp-sel">
+                <option value="">السنة كاملة</option>
+                <option value="0">يناير</option><option value="1">فبراير</option><option value="2">مارس</option>
+                <option value="3">أبريل</option><option value="4">مايو</option><option value="5">يونيو</option>
+                <option value="6">يوليو</option><option value="7">أغسطس</option><option value="8">سبتمبر</option>
+                <option value="9">أكتوبر</option><option value="10">نوفمبر</option><option value="11">ديسمبر</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-gold" style="padding:9px 24px" onclick="renderComparison()">مقارنة</button>
+        </div>
+        <div id="cmpResult" style="margin-top:16px"></div>
+      </div>
+
       <!-- شريط الأدوات -->
       <div class="ch-toolbar">
         <div class="ch-period-btns">
-          <button class="ch-period-btn active" onclick="setPeriod('daily',this)">يومي</button>
+          <button class="ch-period-btn" onclick="setPeriod('daily',this)">يومي</button>
           <button class="ch-period-btn" onclick="setPeriod('weekly',this)">أسبوعي</button>
-          <button class="ch-period-btn active2" onclick="setPeriod('monthly',this)">شهري</button>
+          <button class="ch-period-btn active" onclick="setPeriod('monthly',this)">شهري</button>
           <button class="ch-period-btn" onclick="setPeriod('yearly',this)">سنوي</button>
         </div>
         <select id="ch_type" onchange="renderCharts()">
@@ -389,73 +434,107 @@
           <option value="8">سبتمبر</option><option value="9">أكتوبر</option>
           <option value="10">نوفمبر</option><option value="11">ديسمبر</option>
         </select>
-        <div class="sep"></div>
-        <button class="export-btn" onclick="exportChartsExcel()">📥 Excel</button>
-        <button class="export-btn" style="background:var(--card2);color:var(--text)" onclick="exportChartsPDF()">📄 PDF</button>
-      </div>
-
-      <!-- المقارنة بين فترتين -->
-      <div class="section-card" style="margin-bottom:0">
-        <div class="section-title">⚖️ المقارنة بين فترتين</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <label style="font-size:.78rem;color:var(--text-muted)">الفترة الأولى</label>
-            <div style="display:flex;gap:8px">
-              <select id="cmp_y1" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);padding:7px 10px;font-size:.85rem;outline:none">
-                <script>for(let y=new Date().getFullYear();y>=2026;y--)document.write(`<option value="${y}">${y}</option>`)</script>
-              </select>
-              <select id="cmp_m1" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);padding:7px 10px;font-size:.85rem;outline:none">
-                <option value="">السنة كاملة</option>
-                <option value="0">يناير</option><option value="1">فبراير</option><option value="2">مارس</option>
-                <option value="3">أبريل</option><option value="4">مايو</option><option value="5">يونيو</option>
-                <option value="6">يوليو</option><option value="7">أغسطس</option><option value="8">سبتمبر</option>
-                <option value="9">أكتوبر</option><option value="10">نوفمبر</option><option value="11">ديسمبر</option>
-              </select>
-            </div>
-          </div>
-          <div style="font-size:1.2rem;color:var(--text-muted);padding-top:18px">vs</div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <label style="font-size:.78rem;color:var(--text-muted)">الفترة الثانية</label>
-            <div style="display:flex;gap:8px">
-              <select id="cmp_y2" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);padding:7px 10px;font-size:.85rem;outline:none">
-                <script>for(let y=new Date().getFullYear();y>=2026;y--)document.write(`<option value="${y}">${y}</option>`)</script>
-              </select>
-              <select id="cmp_m2" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);padding:7px 10px;font-size:.85rem;outline:none">
-                <option value="">السنة كاملة</option>
-                <option value="0">يناير</option><option value="1">فبراير</option><option value="2">مارس</option>
-                <option value="3">أبريل</option><option value="4">مايو</option><option value="5">يونيو</option>
-                <option value="6">يوليو</option><option value="7">أغسطس</option><option value="8">سبتمبر</option>
-                <option value="9">أكتوبر</option><option value="10">نوفمبر</option><option value="11">ديسمبر</option>
-              </select>
-            </div>
-          </div>
-          <button class="btn btn-gold" style="margin-top:18px;padding:8px 20px" onclick="renderComparison()">مقارنة</button>
-        </div>
-        <div id="cmpResult" style="margin-top:14px"></div>
       </div>
 
       <!-- KPIs -->
       <div class="ch-kpis">
-        <div class="kpi"><div class="kpi-val profit" id="kpi_sell">0</div><div class="kpi-lbl">إجمالي المبيعات</div></div>
-        <div class="kpi"><div class="kpi-val loss"   id="kpi_buy">0</div><div class="kpi-lbl">إجمالي المشتريات</div></div>
-        <div class="kpi"><div class="kpi-val"        id="kpi_profit">0</div><div class="kpi-lbl">صافي الربح/الخسارة</div></div>
-        <div class="kpi"><div class="kpi-val" style="color:var(--gold)" id="kpi_top">—</div><div class="kpi-lbl">أكثر منتج مبيعاً</div></div>
-        <div class="kpi"><div class="kpi-val" style="color:#378add" id="kpi_count">0</div><div class="kpi-lbl">عدد الخطابات</div></div>
+        <div class="kpi">
+          <div class="kpi-icon">💹</div>
+          <div class="kpi-val profit" id="kpi_sell">٠ ر.س</div>
+          <div class="kpi-lbl">إجمالي المبيعات</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-icon">🛒</div>
+          <div class="kpi-val loss" id="kpi_buy">٠ ر.س</div>
+          <div class="kpi-lbl">إجمالي المشتريات</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-icon">📈</div>
+          <div class="kpi-val" id="kpi_profit">٠ ر.س</div>
+          <div class="kpi-lbl">صافي الربح / الخسارة</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-icon">🏆</div>
+          <div class="kpi-val" style="color:var(--gold);font-size:1rem" id="kpi_top">—</div>
+          <div class="kpi-lbl">أكثر منتج مبيعاً</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-icon">📄</div>
+          <div class="kpi-val" style="color:#378add" id="kpi_count">٠</div>
+          <div class="kpi-lbl">عدد الخطابات</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-icon">📊</div>
+          <div class="kpi-val" style="color:var(--gold)" id="kpi_margin">٠%</div>
+          <div class="kpi-lbl">هامش الربح</div>
+        </div>
       </div>
 
-      <!-- الرسوم البيانية -->
+      <!-- صف 1: مبيعات/مشتريات + ربح/خسارة -->
       <div class="ch-grid">
-        <div class="ch-card"><div class="ch-card-hdr">📊 المبيعات والمشتريات</div><canvas id="chartMain"></canvas></div>
-        <div class="ch-card"><div class="ch-card-hdr">📉 الربح والخسارة</div><canvas id="chartPnL"></canvas></div>
-        <div class="ch-card"><div class="ch-card-hdr">🏆 أكثر المنتجات مبيعاً (كمية)</div><canvas id="chartTopSell"></canvas></div>
-        <div class="ch-card"><div class="ch-card-hdr">🛒 أكثر المنتجات شراءً (كمية)</div><canvas id="chartTopBuy"></canvas></div>
-        <div class="ch-card wide"><div class="ch-card-hdr">⚖️ بيع مقابل شراء لكل منتج</div><canvas id="chartCompare"></canvas></div>
+        <div class="ch-card">
+          <div class="ch-card-hdr">📊 المبيعات والمشتريات <span id="lbl_main" class="ch-period-lbl"></span></div>
+          <canvas id="chartMain"></canvas>
+        </div>
+        <div class="ch-card">
+          <div class="ch-card-hdr">📉 الربح والخسارة <span id="lbl_pnl" class="ch-period-lbl"></span></div>
+          <canvas id="chartPnL"></canvas>
+        </div>
+      </div>
+
+      <!-- صف 2: دونات المنتجات -->
+      <div class="ch-grid">
+        <div class="ch-card">
+          <div class="ch-card-hdr">🟢 توزيع المبيعات بالمنتج</div>
+          <canvas id="chartSellDoughnut"></canvas>
+        </div>
+        <div class="ch-card">
+          <div class="ch-card-hdr">🔵 توزيع المشتريات بالمنتج</div>
+          <canvas id="chartBuyDoughnut"></canvas>
+        </div>
+      </div>
+
+      <!-- صف 3: أكثر المنتجات -->
+      <div class="ch-grid">
+        <div class="ch-card">
+          <div class="ch-card-hdr">🏆 أكثر المنتجات مبيعاً (كمية)</div>
+          <canvas id="chartTopSell"></canvas>
+        </div>
+        <div class="ch-card">
+          <div class="ch-card-hdr">🛒 أكثر المنتجات شراءً (كمية)</div>
+          <canvas id="chartTopBuy"></canvas>
+        </div>
+      </div>
+
+      <!-- صف 4: بيع vs شراء + خط الاتجاه -->
+      <div class="ch-grid">
         <div class="ch-card wide">
-          <div class="ch-card-hdr">📋 جدول تفصيلي بالمنتجات</div>
-          <div style="overflow-x:auto"><table class="rec-table" id="detailTable">
-            <thead><tr><th>المنتج</th><th>كمية البيع</th><th>قيمة البيع</th><th>كمية الشراء</th><th>قيمة الشراء</th><th>الربح</th><th>الحالة</th></tr></thead>
+          <div class="ch-card-hdr">⚖️ بيع مقابل شراء لكل منتج (القيمة)</div>
+          <canvas id="chartCompare"></canvas>
+        </div>
+      </div>
+
+      <!-- صف 5: خط الاتجاه التراكمي -->
+      <div class="ch-grid">
+        <div class="ch-card wide">
+          <div class="ch-card-hdr">📈 خط الاتجاه التراكمي للربح</div>
+          <canvas id="chartTrend"></canvas>
+        </div>
+      </div>
+
+      <!-- الجدول التفصيلي -->
+      <div class="ch-card wide">
+        <div class="ch-card-hdr">📋 جدول تفصيلي بكل المنتجات</div>
+        <div style="overflow-x:auto">
+          <table class="rec-table" id="detailTable">
+            <thead><tr>
+              <th>المنتج</th>
+              <th>كمية البيع</th><th>قيمة البيع</th>
+              <th>كمية الشراء</th><th>قيمة الشراء</th>
+              <th>الربح</th><th>هامش %</th><th>الحالة</th>
+            </tr></thead>
             <tbody id="detailTableBody"></tbody>
-          </table></div>
+          </table>
         </div>
       </div>
 
@@ -1017,276 +1096,299 @@ async function permanentDelete(id){
 }
 
 // ══ الجدول التفاعلي ══════════════════════════════════════════════
-let chartInstances={}, chartsData=[], currentPeriod='monthly';
+let CI={}, CD=[], CP='monthly';
 const MAR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-const CC={sell:'rgba(39,174,96,0.85)',buy:'rgba(55,138,221,0.85)',profit:'rgba(232,114,42,0.85)',loss:'rgba(231,76,60,0.85)'};
-const SO={responsive:true,maintainAspectRatio:true,animation:{duration:500},plugins:{legend:{position:'top',labels:{color:'#ccc',font:{size:11}}}},scales:{x:{ticks:{color:'#aaa'},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#aaa',callback:v=>v.toLocaleString('ar-SA')},grid:{color:'rgba(255,255,255,0.04)'}}}};
+const DCOLORS=['rgba(232,114,42,.85)','rgba(55,138,221,.85)','rgba(39,174,96,.85)','rgba(231,76,60,.85)','rgba(155,89,182,.85)','rgba(241,196,15,.85)','rgba(26,188,156,.85)','rgba(231,76,60,.7)'];
+
+// خيارات مشتركة للشارت
+function baseOpts(yLabel='ر.س'){
+  return{
+    responsive:true,maintainAspectRatio:true,
+    animation:{duration:500,easing:'easeInOutQuart'},
+    plugins:{
+      legend:{position:'top',labels:{color:'#bbb',font:{size:11},padding:12,usePointStyle:true}},
+      tooltip:{backgroundColor:'#1c1c1c',titleColor:'#e8722a',bodyColor:'#eee',borderColor:'#333',borderWidth:1,padding:10,
+        callbacks:{label:ctx=>`${ctx.dataset.label||''}: ${Number(ctx.parsed.y||ctx.parsed||0).toLocaleString('ar-SA')} ${yLabel}`}
+      }
+    },
+    scales:{
+      x:{ticks:{color:'#888',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
+      y:{ticks:{color:'#888',font:{size:10},callback:v=>v>=1000?(v/1000).toFixed(1)+'k':v},grid:{color:'rgba(255,255,255,0.04)'}}
+    }
+  };
+}
 
 function setPeriod(p,btn){
-  currentPeriod=p;
+  CP=p;
   document.querySelectorAll('.ch-period-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  // إظهار/إخفاء الفلاتر حسب الفترة
-  document.getElementById('ch_month').style.display=(p==='daily'||p==='weekly')?'':'none';
+  // إظهار فلتر الشهر فقط للأسبوعي واليومي
+  const mSel=document.getElementById('ch_month');
+  mSel.style.display=(p==='daily'||p==='weekly')?'':'none';
   renderCharts();
 }
 
 async function loadCharts(){
   try{
     const {data,error}=await supabase.from('letters').select('*').eq('status','approved').order('created_at',{ascending:false});
-    if(error) throw error; chartsData=data||[];
+    if(error) throw error; CD=data||[];
   }catch(e){
-    chartsData=JSON.parse(localStorage.getItem('syk_letters')||'[]').filter(l=>l.status==='approved');
+    CD=JSON.parse(localStorage.getItem('syk_letters')||'[]').filter(l=>l.status==='approved');
   }
   renderCharts();
 }
 
-function filterData(){
-  const year=document.getElementById('ch_year').value;
-  const type=document.getElementById('ch_type').value;
-  const month=document.getElementById('ch_month').value;
-  return chartsData.filter(l=>{
+function fData(){
+  const yr=document.getElementById('ch_year').value;
+  const tp=document.getElementById('ch_type').value;
+  const mo=document.getElementById('ch_month').value;
+  return CD.filter(l=>{
     const d=new Date(l.created_at);
-    return(!year||String(d.getFullYear())===year)
-      &&(!type||l.letter_type===type)
-      &&(month===''||currentPeriod==='monthly'||currentPeriod==='yearly'||String(d.getMonth())===month);
+    return(!yr||String(d.getFullYear())===yr)
+      &&(!tp||l.letter_type===tp)
+      &&(mo===''||CP==='monthly'||CP==='yearly'||String(d.getMonth())===mo);
   });
 }
 
-function amt(l){return(parseFloat(l.quantity)||0)*(parseFloat(l.sale_price)||0);}
-function qty(l){return parseFloat(l.quantity)||0;}
+function R(n){return Number(n)||0;}
+function amt(l){return R(l.quantity)*R(l.sale_price);}
+function qty(l){return R(l.quantity);}
 
-function buildPeriodLabelsAndData(data,op){
-  const rows=data.filter(l=>l.operation===op);
+// بناء بيانات الفترة حسب النوع
+function periodData(rows,op){
+  const sel=rows.filter(l=>l.operation===op);
   const map={};
-  rows.forEach(l=>{
+  sel.forEach(l=>{
     const d=new Date(l.created_at);
-    let key='';
-    if(currentPeriod==='daily')   key=d.toLocaleDateString('ar-SA');
-    else if(currentPeriod==='weekly'){ const wk=getWeek(d); key=`أسبوع ${wk}`; }
-    else if(currentPeriod==='monthly') key=MAR[d.getMonth()];
-    else key=String(d.getFullYear());
-    map[key]=(map[key]||0)+amt(l);
+    let k='';
+    if(CP==='daily') k=d.toLocaleDateString('ar-SA');
+    else if(CP==='weekly'){
+      // الأسبوع من الشهر
+      const firstDay=new Date(d.getFullYear(),d.getMonth(),1).getDay();
+      const wk=Math.ceil((d.getDate()+firstDay)/7);
+      k=`الأسبوع ${wk} — ${MAR[d.getMonth()]}`;
+    }
+    else if(CP==='monthly') k=MAR[d.getMonth()];
+    else k=String(d.getFullYear());
+    map[k]=(map[k]||0)+amt(l);
   });
   return map;
 }
 
-function getWeek(d){
-  const start=new Date(d.getFullYear(),0,1);
-  return Math.ceil(((d-start)/86400000+start.getDay()+1)/7);
+function dc(id,type,data,opts){
+  const ctx=document.getElementById(id); if(!ctx) return;
+  if(CI[id]){CI[id].destroy();delete CI[id];}
+  CI[id]=new Chart(ctx,{type,data,options:{...opts,responsive:true,maintainAspectRatio:true}});
 }
 
 function renderCharts(){
-  const data=filterData();
+  const data=fData();
   const sells=data.filter(l=>l.operation==='تم البيع');
   const buys=data.filter(l=>l.operation==='تم الشراء');
 
-  const totalSell=sells.reduce((s,l)=>s+amt(l),0);
-  const totalBuy=buys.reduce((s,l)=>s+amt(l),0);
-  const profit=totalSell-totalBuy;
+  const ts=sells.reduce((s,l)=>s+amt(l),0);
+  const tb=buys.reduce((s,l)=>s+amt(l),0);
+  const prf=ts-tb;
+  const margin=ts>0?((prf/ts)*100):0;
+
+  // تنسيق الأرقام بشكل احترافي
+  function fmtNum(n){
+    if(n>=1000000) return (n/1000000).toFixed(2)+' م';
+    if(n>=1000) return (n/1000).toFixed(1)+' ك';
+    return n.toLocaleString('ar-SA');
+  }
 
   // KPIs
-  document.getElementById('kpi_sell').textContent=totalSell.toLocaleString('ar-SA')+' ر.س';
-  document.getElementById('kpi_sell').className='kpi-val profit';
-  document.getElementById('kpi_buy').textContent=totalBuy.toLocaleString('ar-SA')+' ر.س';
-  document.getElementById('kpi_buy').className='kpi-val loss';
-  document.getElementById('kpi_profit').textContent=(profit>=0?'+':'')+profit.toLocaleString('ar-SA')+' ر.س';
-  document.getElementById('kpi_profit').className='kpi-val '+(profit>=0?'profit':'loss');
-  document.getElementById('kpi_count').textContent=data.length;
+  document.getElementById('kpi_sell').textContent   = fmtNum(ts)+' ر.س';
+  document.getElementById('kpi_buy').textContent    = fmtNum(tb)+' ر.س';
+  document.getElementById('kpi_profit').textContent = (prf>=0?'+':'')+fmtNum(prf)+' ر.س';
+  document.getElementById('kpi_profit').className   = 'kpi-val '+(prf>=0?'profit':'loss');
+  document.getElementById('kpi_count').textContent  = data.length;
+  document.getElementById('kpi_margin').textContent = margin.toFixed(1)+'%';
+  document.getElementById('kpi_margin').className   = 'kpi-val '+(margin>=0?'profit':'loss');
 
-  const sqMap={};
-  sells.forEach(l=>{const k=l.product_description||'غير محدد';sqMap[k]=(sqMap[k]||0)+qty(l);});
-  const top=Object.entries(sqMap).sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById('kpi_top').textContent=top?`${top[0]} (${top[1]})`:'—';
+  const sqM={};
+  sells.forEach(l=>{const k=l.product_description||'غير محدد';sqM[k]=(sqM[k]||0)+qty(l);});
+  const top=Object.entries(sqM).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('kpi_top').textContent=top?`${top[0]}`:' — ';
 
-  // بيانات الفترة
-  const sellMap=buildPeriodLabelsAndData(data,'تم البيع');
-  const buyMap=buildPeriodLabelsAndData(data,'تم الشراء');
-  const allKeys=[...new Set([...Object.keys(sellMap),...Object.keys(buyMap)])].sort();
-  const sellVals=allKeys.map(k=>sellMap[k]||0);
-  const buyVals=allKeys.map(k=>buyMap[k]||0);
-  const pnlVals=allKeys.map((_,i)=>sellVals[i]-buyVals[i]);
+  // تسمية الفترة
+  const pLabels={daily:'يومي',weekly:'أسبوعي',monthly:'شهري',yearly:'سنوي'};
+  document.getElementById('lbl_main').textContent=`(${pLabels[CP]})`;
+  document.getElementById('lbl_pnl').textContent=`(${pLabels[CP]})`;
 
-  // رسم 1: مبيعات ومشتريات
-  dc('chartMain','bar',{labels:allKeys,datasets:[
-    {label:'المبيعات',data:sellVals,backgroundColor:CC.sell,borderRadius:5},
-    {label:'المشتريات',data:buyVals,backgroundColor:CC.buy,borderRadius:5},
-  ]},{...SO,plugins:{...SO.plugins,tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('ar-SA')} ر.س`}}}});
+  // بيانات المحور الزمني
+  const sm=periodData(data,'تم البيع');
+  const bm=periodData(data,'تم الشراء');
+  const keys=[...new Set([...Object.keys(sm),...Object.keys(bm)])].sort();
+  const sv=keys.map(k=>sm[k]||0);
+  const bv=keys.map(k=>bm[k]||0);
+  const pv=keys.map((_,i)=>sv[i]-bv[i]);
 
-  // رسم 2: ربح وخسارة
-  dc('chartPnL','bar',{labels:allKeys,datasets:[{
-    label:'الربح/الخسارة',data:pnlVals,
-    backgroundColor:pnlVals.map(v=>v>=0?CC.profit:CC.loss),borderRadius:5
-  }]},{...SO,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y>=0?'ربح':'خسارة'}: ${Math.abs(ctx.parsed.y).toLocaleString('ar-SA')} ر.س`}}}});
+  // رسم 1: مبيعات ومشتريات (bars)
+  dc('chartMain','bar',{
+    labels:keys,
+    datasets:[
+      {label:'المبيعات',data:sv,backgroundColor:'rgba(39,174,96,.8)',borderRadius:5,borderSkipped:false},
+      {label:'المشتريات',data:bv,backgroundColor:'rgba(55,138,221,.8)',borderRadius:5,borderSkipped:false},
+    ]
+  },baseOpts());
 
-  // رسم 3 & 4: أكثر المنتجات
-  const prodSQ={},prodBQ={},prodSA={},prodBA={};
-  sells.forEach(l=>{const k=l.product_description||'غير محدد';prodSQ[k]=(prodSQ[k]||0)+qty(l);prodSA[k]=(prodSA[k]||0)+amt(l);});
-  buys.forEach(l=>{const k=l.product_description||'غير محدد';prodBQ[k]=(prodBQ[k]||0)+qty(l);prodBA[k]=(prodBA[k]||0)+amt(l);});
+  // رسم 2: ربح وخسارة (bar ملونة)
+  dc('chartPnL','bar',{
+    labels:keys,
+    datasets:[{
+      label:'الربح/الخسارة',
+      data:pv,
+      backgroundColor:pv.map(v=>v>=0?'rgba(39,174,96,.85)':'rgba(231,76,60,.85)'),
+      borderRadius:5,borderSkipped:false,
+    }]
+  },{...baseOpts(),plugins:{...baseOpts().plugins,legend:{display:false},tooltip:{...baseOpts().plugins.tooltip,callbacks:{label:ctx=>`${ctx.parsed.y>=0?'ربح':'خسارة'}: ${Math.abs(ctx.parsed.y).toLocaleString('ar-SA')} ر.س`}}}});
 
-  const tse=Object.entries(prodSQ).sort((a,b)=>b[1]-a[1]);
-  const tbe=Object.entries(prodBQ).sort((a,b)=>b[1]-a[1]);
-  const hOpts={...SO,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#aaa'},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#ddd'}}}};
-  dc('chartTopSell','bar',{labels:tse.map(e=>e[0]),datasets:[{label:'كمية البيع',data:tse.map(e=>e[1]),backgroundColor:CC.sell,borderRadius:5}]},hOpts);
-  dc('chartTopBuy','bar',{labels:tbe.map(e=>e[0]),datasets:[{label:'كمية الشراء',data:tbe.map(e=>e[1]),backgroundColor:CC.buy,borderRadius:5}]},hOpts);
+  // بيانات المنتجات
+  const pSQ={},pBQ={},pSA={},pBA={};
+  sells.forEach(l=>{const k=l.product_description||'غير محدد';pSQ[k]=(pSQ[k]||0)+qty(l);pSA[k]=(pSA[k]||0)+amt(l);});
+  buys.forEach(l=>{const k=l.product_description||'غير محدد';pBQ[k]=(pBQ[k]||0)+qty(l);pBA[k]=(pBA[k]||0)+amt(l);});
+  const allP=[...new Set([...Object.keys(pSA),...Object.keys(pBA)])];
 
-  // رسم 5: مقارنة المنتجات
-  const allP=[...new Set([...Object.keys(prodSA),...Object.keys(prodBA)])];
-  dc('chartCompare','bar',{labels:allP,datasets:[
-    {label:'قيمة البيع',data:allP.map(p=>prodSA[p]||0),backgroundColor:CC.sell,borderRadius:5},
-    {label:'قيمة الشراء',data:allP.map(p=>prodBA[p]||0),backgroundColor:CC.buy,borderRadius:5},
-  ]},{...SO,plugins:{...SO.plugins,tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('ar-SA')} ر.س`}}}});
+  // رسم 3: دونات المبيعات
+  dc('chartSellDoughnut','doughnut',{
+    labels:Object.keys(pSA),
+    datasets:[{data:Object.values(pSA),backgroundColor:DCOLORS,borderWidth:2,borderColor:'#161616'}]
+  },{responsive:true,maintainAspectRatio:true,animation:{duration:500},plugins:{legend:{position:'right',labels:{color:'#bbb',font:{size:10},padding:8,usePointStyle:true}},tooltip:{backgroundColor:'#1c1c1c',titleColor:'#e8722a',bodyColor:'#eee',borderColor:'#333',borderWidth:1,callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed.toLocaleString('ar-SA')} ر.س`}}}});
+
+  // رسم 4: دونات المشتريات
+  dc('chartBuyDoughnut','doughnut',{
+    labels:Object.keys(pBA),
+    datasets:[{data:Object.values(pBA),backgroundColor:DCOLORS,borderWidth:2,borderColor:'#161616'}]
+  },{responsive:true,maintainAspectRatio:true,animation:{duration:500},plugins:{legend:{position:'right',labels:{color:'#bbb',font:{size:10},padding:8,usePointStyle:true}},tooltip:{backgroundColor:'#1c1c1c',titleColor:'#e8722a',bodyColor:'#eee',borderColor:'#333',borderWidth:1,callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed.toLocaleString('ar-SA')} ر.س`}}}});
+
+  // رسم 5 & 6: أكثر المنتجات
+  const hBase={responsive:true,maintainAspectRatio:true,animation:{duration:500},indexAxis:'y',
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1c',bodyColor:'#eee',borderColor:'#333',borderWidth:1}},
+    scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#ccc',font:{size:10}}}}};
+  const tse=Object.entries(pSQ).sort((a,b)=>b[1]-a[1]);
+  const tbe=Object.entries(pBQ).sort((a,b)=>b[1]-a[1]);
+  dc('chartTopSell','bar',{labels:tse.map(e=>e[0]),datasets:[{label:'كمية البيع',data:tse.map(e=>e[1]),backgroundColor:'rgba(39,174,96,.8)',borderRadius:5}]},hBase);
+  dc('chartTopBuy','bar',{labels:tbe.map(e=>e[0]),datasets:[{label:'كمية الشراء',data:tbe.map(e=>e[1]),backgroundColor:'rgba(55,138,221,.8)',borderRadius:5}]},hBase);
+
+  // رسم 7: مقارنة بيع vs شراء
+  dc('chartCompare','bar',{
+    labels:allP,
+    datasets:[
+      {label:'قيمة البيع',data:allP.map(p=>pSA[p]||0),backgroundColor:'rgba(39,174,96,.8)',borderRadius:5,borderSkipped:false},
+      {label:'قيمة الشراء',data:allP.map(p=>pBA[p]||0),backgroundColor:'rgba(55,138,221,.8)',borderRadius:5,borderSkipped:false},
+    ]
+  },baseOpts());
+
+  // رسم 8: خط الاتجاه التراكمي
+  let cumProfit=0;
+  const trendVals=keys.map((_,i)=>{cumProfit+=pv[i];return cumProfit;});
+  dc('chartTrend','line',{
+    labels:keys,
+    datasets:[{
+      label:'الربح التراكمي',data:trendVals,
+      borderColor:'rgba(232,114,42,.9)',backgroundColor:'rgba(232,114,42,.08)',
+      borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#e8722a',
+      fill:true,tension:0.3,
+    }]
+  },{...baseOpts(),plugins:{...baseOpts().plugins,legend:{display:false}}});
 
   // الجدول التفصيلي
   const tbody=document.getElementById('detailTableBody');
   tbody.innerHTML=allP.map(p=>{
-    const sa=prodSA[p]||0, ba=prodBA[p]||0, prf=sa-ba;
-    return `<tr>
+    const sa=pSA[p]||0,ba=pBA[p]||0,prf=sa-ba;
+    const mgn=sa>0?((prf/sa)*100).toFixed(1):'0';
+    return`<tr>
       <td><b>${p}</b></td>
-      <td>${prodSQ[p]||0}</td>
+      <td>${pSQ[p]||0}</td>
       <td>${sa.toLocaleString('ar-SA')} ر.س</td>
-      <td>${prodBQ[p]||0}</td>
+      <td>${pBQ[p]||0}</td>
       <td>${ba.toLocaleString('ar-SA')} ر.س</td>
       <td style="font-weight:700;color:${prf>=0?'#27ae60':'#e74c3c'}">${(prf>=0?'+':'')+prf.toLocaleString('ar-SA')} ر.س</td>
+      <td style="color:${Number(mgn)>=0?'#27ae60':'#e74c3c'}">${mgn}%</td>
       <td><span class="${prf>=0?'badge-up':'badge-dn'}">${prf>=0?'ربح':'خسارة'}</span></td>
     </tr>`;
-  }).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:16px">لا توجد بيانات</td></tr>';
+  }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:16px">لا توجد بيانات</td></tr>';
 
-  // توصيات الإدارة
-  buildRecommendations(sells,buys,prodSQ,prodBQ,prodSA,prodBA,profit,totalSell,totalBuy);
+  buildRecommendations(sells,buys,pSQ,pBQ,pSA,pBA,prf,ts,tb,margin);
 }
 
-function buildRecommendations(sells,buys,pSQ,pBQ,pSA,pBA,profit,totalSell,totalBuy){
+function buildRecommendations(sells,buys,pSQ,pBQ,pSA,pBA,profit,ts,tb,margin){
   const recs=[];
-  const topSell=Object.entries(pSQ).sort((a,b)=>b[1]-a[1])[0];
-  const topBuy=Object.entries(pBQ).sort((a,b)=>b[1]-a[1])[0];
-  const worstSell=Object.entries(pSA).sort((a,b)=>a[1]-b[1])[0];
+  const topS=Object.entries(pSQ).sort((a,b)=>b[1]-a[1])[0];
+  const topB=Object.entries(pBQ).sort((a,b)=>b[1]-a[1])[0];
+  const worstS=Object.entries(pSA).sort((a,b)=>a[1]-b[1])[0];
 
-  if(profit>0) recs.push({icon:'✅',color:'#27ae60',text:`الوضع المالي إيجابي — صافي ربح ${profit.toLocaleString('ar-SA')} ر.س. استمر في نفس الاستراتيجية.`});
-  else if(profit<0) recs.push({icon:'⚠️',color:'#e74c3c',text:`تحذير: خسارة ${Math.abs(profit).toLocaleString('ar-SA')} ر.س. راجع أسعار البيع وقلل المشتريات.`});
+  if(profit>0)    recs.push({i:'✅',c:'#27ae60',t:`الوضع المالي إيجابي — صافي ربح ${profit.toLocaleString('ar-SA')} ر.س. استمر في نفس الاستراتيجية.`});
+  else if(profit<0) recs.push({i:'⚠️',c:'#e74c3c',t:`تحذير: خسارة ${Math.abs(profit).toLocaleString('ar-SA')} ر.س. راجع أسعار البيع وقلل المشتريات.`});
 
-  if(topSell) recs.push({icon:'🏆',color:'#e8722a',text:`المنتج الأكثر مبيعاً هو "${topSell[0]}" بكمية ${topSell[1]}. يُنصح بزيادة المخزون منه.`});
-  if(topBuy&&topSell&&topBuy[0]!==topSell[0]) recs.push({icon:'🛒',color:'#378add',text:`تشتري أكثر من "${topBuy[0]}" لكنه ليس الأكثر مبيعاً — راجع جدوى الشراء بهذه الكميات.`});
-  if(worstSell) recs.push({icon:'📉',color:'#888',text:`المنتج الأضعف مبيعاً "${worstSell[0]}" — فكّر في تخفيض سعره أو تقليل شراؤه.`});
-  if(totalSell>0&&totalBuy>0){
-    const margin=((totalSell-totalBuy)/totalSell*100).toFixed(1);
-    recs.push({icon:'📊',color:'#c9a84c',text:`هامش الربح الإجمالي ${margin}%${margin>20?' — ممتاز':margin>10?' — جيد':' — منخفض، راجع التسعير'}.`});
-  }
+  if(margin>=20)    recs.push({i:'💰',c:'#27ae60',t:`هامش الربح ${margin.toFixed(1)}% — ممتاز. حافظ على هذه النسبة.`});
+  else if(margin>0) recs.push({i:'📊',c:'#e8722a',t:`هامش الربح ${margin.toFixed(1)}% — جيد. يمكن تحسينه برفع الأسعار أو خفض تكاليف الشراء.`});
+  else if(margin<0) recs.push({i:'📉',c:'#e74c3c',t:`هامش الربح سلبي ${margin.toFixed(1)}% — خسارة في كل عملية. راجع التسعير فوراً.`});
+
+  if(topS) recs.push({i:'🏆',c:'#e8722a',t:`المنتج الأكثر مبيعاً "${topS[0]}" بكمية ${topS[1]}. يُنصح بزيادة المخزون.`});
+  if(topB&&topS&&topB[0]!==topS[0]) recs.push({i:'🛒',c:'#378add',t:`تشتري أكثر من "${topB[0]}" لكنه ليس الأكثر مبيعاً — راجع الحاجة الفعلية.`});
+  if(worstS&&Object.keys(pSA).length>1) recs.push({i:'📉',c:'#888',t:`المنتج الأضعف مبيعاً "${worstS[0]}" — فكّر في تخفيض سعره أو تقليل شراؤه.`});
 
   document.getElementById('recommendations').innerHTML=recs.map(r=>`
-    <div style="display:flex;gap:12px;align-items:flex-start;background:var(--card2);border-radius:8px;padding:12px 16px;border-right:3px solid ${r.color}">
-      <span style="font-size:1.2rem">${r.icon}</span>
-      <span style="font-size:.88rem;color:var(--text);line-height:1.6">${r.text}</span>
-    </div>`).join('')||'<div style="color:var(--text-muted);font-size:.88rem">لا توجد بيانات كافية للتوصيات.</div>';
+    <div style="display:flex;gap:12px;align-items:flex-start;background:var(--card2);border-radius:8px;padding:12px 16px;border-right:3px solid ${r.c}">
+      <span style="font-size:1.1rem;flex-shrink:0">${r.i}</span>
+      <span style="font-size:.85rem;color:var(--text);line-height:1.7">${r.t}</span>
+    </div>`).join('')||'<div style="color:var(--text-muted);font-size:.85rem;padding:8px">لا توجد بيانات كافية.</div>';
 }
 
-function dc(id,type,data,opts={}){
-  const ctx=document.getElementById(id); if(!ctx) return;
-  if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}
-  chartInstances[id]=new Chart(ctx,{type,data,options:{responsive:true,maintainAspectRatio:true,animation:{duration:500},...opts}});
-}
-
-// مقارنة فترتين
+// المقارنة بين فترتين
 function renderComparison(){
   const y1=document.getElementById('cmp_y1').value;
   const m1=document.getElementById('cmp_m1').value;
   const y2=document.getElementById('cmp_y2').value;
   const m2=document.getElementById('cmp_m2').value;
 
-  function filterPeriod(year,month){
-    return chartsData.filter(l=>{
+  function fp(yr,mo){
+    return CD.filter(l=>{
       const d=new Date(l.created_at);
-      return String(d.getFullYear())===year&&(month===''||String(d.getMonth())===month)&&l.status==='approved';
+      return String(d.getFullYear())===yr&&(mo===''||String(d.getMonth())===mo)&&l.status==='approved';
     });
   }
-  function calcPeriod(rows){
+  function cp(rows){
     const s=rows.filter(l=>l.operation==='تم البيع');
     const b=rows.filter(l=>l.operation==='تم الشراء');
     const ts=s.reduce((x,l)=>x+amt(l),0);
     const tb=b.reduce((x,l)=>x+amt(l),0);
-    return{sell:ts,buy:tb,profit:ts-tb,count:rows.length};
+    return{sell:ts,buy:tb,profit:ts-tb,count:rows.length,margin:ts>0?((ts-tb)/ts*100):0};
   }
-  const p1=calcPeriod(filterPeriod(y1,m1));
-  const p2=calcPeriod(filterPeriod(y2,m2));
-  const lbl1=`${y1}${m1!==''?' — '+MAR[+m1]:''}`;
-  const lbl2=`${y2}${m2!==''?' — '+MAR[+m2]:''}`;
+  const p1=cp(fp(y1,m1)), p2=cp(fp(y2,m2));
+  const l1=y1+(m1!==''?' — '+MAR[+m1]:'');
+  const l2=y2+(m2!==''?' — '+MAR[+m2]:'');
 
-  function diff(a,b){const d=a-b,pct=b>0?((d/b)*100).toFixed(1):0;return{d,pct,up:d>=0};}
+  function diff(a,b){const d=a-b,pct=b!==0?((d/Math.abs(b))*100).toFixed(1):0;return{d,pct,up:d>=0};}
   const ds=diff(p1.sell,p2.sell),db=diff(p1.buy,p2.buy),dp=diff(p1.profit,p2.profit);
 
   document.getElementById('cmpResult').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-top:10px">
-      ${cmpBox('المبيعات',p1.sell,p2.sell,lbl1,lbl2,ds)}
-      ${cmpBox('المشتريات',p1.buy,p2.buy,lbl1,lbl2,db)}
-      ${cmpBox('الربح/الخسارة',p1.profit,p2.profit,lbl1,lbl2,dp)}
-      <div class="cmp-card"><div class="cmp-hdr">عدد الخطابات</div>
-        <div style="font-size:1.1rem;font-weight:700;color:var(--gold)">${p1.count} vs ${p2.count}</div>
-        <div style="font-size:.78rem;color:var(--text-muted);margin-top:4px">${lbl1} مقابل ${lbl2}</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+      ${cb('💹 المبيعات',p1.sell,p2.sell,l1,l2,ds,'ر.س')}
+      ${cb('🛒 المشتريات',p1.buy,p2.buy,l1,l2,db,'ر.س')}
+      ${cb('📈 الربح/الخسارة',p1.profit,p2.profit,l1,l2,dp,'ر.س')}
+      <div class="cmp-card">
+        <div class="cmp-hdr">📄 عدد الخطابات</div>
+        <div style="font-size:.82rem;color:var(--text-muted)">${l1}: <b style="color:var(--text)">${p1.count}</b></div>
+        <div style="font-size:.82rem;color:var(--text-muted)">${l2}: <b style="color:var(--text)">${p2.count}</b></div>
+        <div style="margin-top:6px;font-size:.85rem;color:var(--gold);font-weight:700">${p1.count>p2.count?'▲':'▼'} فرق ${Math.abs(p1.count-p2.count)} خطاب</div>
       </div>
     </div>`;
 }
 
-function cmpBox(label,v1,v2,l1,l2,diff){
-  const arrow=diff.up?'▲':'▼';
-  const color=diff.up?'#27ae60':'#e74c3c';
-  return `<div class="cmp-card">
+function cb(label,v1,v2,l1,l2,df,unit=''){
+  const arrow=df.up?'▲':'▼';
+  const color=df.up?'#27ae60':'#e74c3c';
+  return`<div class="cmp-card">
     <div class="cmp-hdr">${label}</div>
-    <div style="font-size:.82rem;color:var(--text-muted)">${l1}: <b style="color:var(--text)">${v1.toLocaleString('ar-SA')} ر.س</b></div>
-    <div style="font-size:.82rem;color:var(--text-muted)">${l2}: <b style="color:var(--text)">${v2.toLocaleString('ar-SA')} ر.س</b></div>
-    <div style="margin-top:6px;font-weight:700;color:${color}">${arrow} ${Math.abs(diff.d).toLocaleString('ar-SA')} ر.س (${Math.abs(diff.pct)}%)</div>
+    <div style="font-size:.8rem;color:var(--text-muted)">${l1}: <b style="color:var(--text)">${v1.toLocaleString('ar-SA')} ${unit}</b></div>
+    <div style="font-size:.8rem;color:var(--text-muted)">${l2}: <b style="color:var(--text)">${v2.toLocaleString('ar-SA')} ${unit}</b></div>
+    <div style="margin-top:8px;font-weight:700;color:${color};font-size:.88rem">${arrow} ${Math.abs(df.d).toLocaleString('ar-SA')} ${unit} (${Math.abs(df.pct)}%)</div>
   </div>`;
 }
-
-// تصدير Excel
-function exportChartsExcel(){
-  const data=filterData();
-  const wb=XLSX.utils.book_new();
-  // ورقة الملخص
-  const sumData=[
-    {'البيان':'إجمالي المبيعات','القيمة':data.filter(l=>l.operation==='تم البيع').reduce((s,l)=>s+amt(l),0)+' ر.س'},
-    {'البيان':'إجمالي المشتريات','القيمة':data.filter(l=>l.operation==='تم الشراء').reduce((s,l)=>s+amt(l),0)+' ر.س'},
-    {'البيان':'عدد الخطابات','القيمة':data.length},
-  ];
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(sumData),'الملخص');
-  // ورقة البيع
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data.filter(l=>l.operation==='تم البيع').map(l=>({'رقم الخطاب':l.letter_number,'المنتج':l.product_description,'الكمية':l.quantity,'السعر':l.sale_price,'المجموع':amt(l),'التاريخ':new Date(l.created_at).toLocaleDateString('ar-SA'),'المرسل':l.sender}))),'المبيعات');
-  // ورقة الشراء
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data.filter(l=>l.operation==='تم الشراء').map(l=>({'رقم الخطاب':l.letter_number,'المنتج':l.product_description,'الكمية':l.quantity,'السعر':l.sale_price,'المجموع':amt(l),'التاريخ':new Date(l.created_at).toLocaleDateString('ar-SA'),'المرسل':l.sender}))),'المشتريات');
-  XLSX.writeFile(wb,`SYK-Charts-${new Date().toLocaleDateString('ar-SA').replace(/\//g,'-')}.xlsx`);
-  showToast('✅ تم تصدير Excel');
-}
-
-// تصدير PDF
-async function exportChartsPDF(){
-  showToast('⏳ جاري التصدير...');
-  try{
-    const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({orientation:'l',unit:'px',format:'a4',hotfixes:['px_scaling']});
-    const pdfW=doc.internal.pageSize.getWidth();
-    const section=document.getElementById('tab-charts');
-    const canvas=await html2canvas(section,{scale:1.5,backgroundColor:'#0e0e0e',useCORS:true,windowWidth:1200});
-    const imgH=pdfW*(canvas.height/canvas.width);
-    const pdfH=doc.internal.pageSize.getHeight();
-    if(imgH<=pdfH){
-      doc.addImage(canvas.toDataURL('image/jpeg',0.85),'JPEG',0,0,pdfW,imgH);
-    } else {
-      const sc=canvas.width/pdfW;
-      const ph=Math.floor(pdfH*sc);
-      let pg=0;
-      for(let py=0;py<canvas.height;py+=ph){
-        if(pg>0) doc.addPage();
-        const sh=Math.min(ph,canvas.height-py);
-        const tc=document.createElement('canvas');tc.width=canvas.width;tc.height=sh;
-        tc.getContext('2d').drawImage(canvas,0,py,canvas.width,sh,0,0,canvas.width,sh);
-        doc.addImage(tc.toDataURL('image/jpeg',0.85),'JPEG',0,0,pdfW,pdfW*(sh/canvas.width));
-        pg++;
-      }
-    }
-    doc.save(`SYK-Charts-${new Date().toLocaleDateString('ar-SA').replace(/\//g,'-')}.pdf`);
-    showToast('✅ تم تصدير PDF');
-  }catch(e){showToast('⚠️ فشل التصدير',true);}
-}
-
 // ══ TOAST ══════════════════════════════════════════════════════
 function showToast(msg,err=false){
   const t=document.getElementById('toast');
