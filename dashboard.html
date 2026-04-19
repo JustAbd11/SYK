@@ -35,6 +35,21 @@
     .trash-card .days-left{font-size:.78rem;color:#e74c3c;margin-top:4px}
     .restore-btn{margin-top:8px;background:transparent;border:1px solid #e74c3c;color:#e74c3c;padding:4px 12px;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:.78rem;transition:all .2s}
     .restore-btn:hover{background:#e74c3c;color:#fff}
+    /* ══ جدول الخطابات v2 ══ */
+    .v2-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+    .v2-toolbar input,.v2-toolbar select{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);padding:8px 12px;font-size:.85rem;outline:none}
+    .v2-toolbar input{flex:1;min-width:180px}
+    .v2-toolbar input:focus,.v2-toolbar select:focus{border-color:var(--gold)}
+    .v2-table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+    .v2-table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:900px}
+    .v2-table thead tr{background:var(--card2)}
+    .v2-table th{padding:11px 14px;text-align:right;font-weight:700;color:var(--text-muted);font-size:.78rem;white-space:nowrap;border-bottom:2px solid var(--border)}
+    .v2-table td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap;vertical-align:middle}
+    .v2-table tbody tr:hover td{background:rgba(232,114,42,.05)}
+    .v2-table tbody tr:last-child td{border-bottom:none}
+    .v2-badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:.72rem;font-weight:600}
+    .v2-count{font-size:.82rem;color:var(--text-muted);margin-bottom:10px}
+    .v2-empty{text-align:center;padding:40px;color:var(--text-muted);font-size:.9rem}
     /* ══ قسم المالية ══ */
     .finance-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
     @media(max-width:700px){.finance-grid{grid-template-columns:1fr}}
@@ -297,6 +312,78 @@
       </div>
     </div>
     <div class="letters-grid" id="lettersGrid"><div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">جاري التحميل...</div></div>
+  </div>
+
+  <!-- ══════════ الخطابات v2 (أدمن) ══════════ -->
+  <div class="tab-content" id="tab-v2">
+    <div class="section-card">
+      <div class="section-title">📑 جدول الخطابات المقبولة — v2</div>
+
+      <!-- شريط البحث والفلاتر -->
+      <div class="v2-toolbar">
+        <input type="text" id="v2_search" placeholder="🔍 ابحث في أي حقل..." oninput="filterV2()">
+        <select id="v2_day" onchange="filterV2()">
+          <option value="">كل الأيام</option>
+          <script>for(let d=1;d<=31;d++)document.write(`<option value="${d}">${d}</option>`)</script>
+        </select>
+        <select id="v2_month" onchange="filterV2()">
+          <option value="">كل الأشهر</option>
+          <option value="0">يناير</option><option value="1">فبراير</option>
+          <option value="2">مارس</option><option value="3">أبريل</option>
+          <option value="4">مايو</option><option value="5">يونيو</option>
+          <option value="6">يوليو</option><option value="7">أغسطس</option>
+          <option value="8">سبتمبر</option><option value="9">أكتوبر</option>
+          <option value="10">نوفمبر</option><option value="11">ديسمبر</option>
+        </select>
+        <select id="v2_year" onchange="filterV2()">
+          <option value="">كل السنوات</option>
+          <script>for(let y=new Date().getFullYear();y>=2026;y--)document.write(`<option value="${y}">${y}</option>`)</script>
+        </select>
+        <select id="v2_type" onchange="filterV2()">
+          <option value="">كل الأنواع</option>
+          <option value="ST">ST</option>
+          <option value="LC">LC</option>
+          <option value="NO">NO</option>
+          <option value="AM">AM</option>
+        </select>
+        <select id="v2_op" onchange="filterV2()">
+          <option value="">بيع وشراء</option>
+          <option value="تم البيع">بيع</option>
+          <option value="تم الشراء">شراء</option>
+        </select>
+        <button class="btn btn-outline" onclick="loadV2()">🔄</button>
+      </div>
+
+      <div class="v2-count" id="v2Count">جاري التحميل...</div>
+
+      <div class="v2-table-wrap">
+        <table class="v2-table" id="v2Table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>رقم الخطاب</th>
+              <th>التاريخ</th>
+              <th>المرسل</th>
+              <th>العملية</th>
+              <th>الاسم</th>
+              <th>الجوال</th>
+              <th>المسؤول</th>
+              <th>الخدمة</th>
+              <th>وصف المنتج</th>
+              <th>الكمية</th>
+              <th>سعر البيع</th>
+              <th>المجموع</th>
+              <th>شحن للحساب</th>
+              <th>شحن من حساب</th>
+              <th>تقييم التجربة</th>
+              <th>ملاحظات</th>
+              <th>التحسينات</th>
+            </tr>
+          </thead>
+          <tbody id="v2Body"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- ══════════ قسم المالية (أدمن) ══════════ -->
@@ -611,6 +698,7 @@ function buildTabs(){
     bar.innerHTML=`
       <button class="tab-btn active" onclick="switchTab('new',this)">➕ خطاب جديد</button>
       <button class="tab-btn" onclick="switchTab('list',this)">📋 المحفوظات</button>
+      <button class="tab-btn" onclick="switchTab('v2',this)">📑 الخطابات v2</button>
       <button class="tab-btn" onclick="switchTab('finance',this)">💰 المالية</button>
       <button class="tab-btn" onclick="switchTab('charts',this)">📈 الجدول التفاعلي</button>
       <button class="tab-btn" onclick="switchTab('trash',this)">🗑️ سلة المهملات</button>`;
@@ -629,6 +717,7 @@ function switchTab(name,btn){
   if(name==='inbox')   loadInbox();
   if(name==='trash')   loadTrash();
   if(name==='finance') loadFinance();
+  if(name==='v2')      loadV2();
   if(name==='charts')  loadCharts();
 }
 buildTabs();
@@ -1563,6 +1652,94 @@ function cb(label,v1,v2,l1,l2,df,unit=''){
     <div style="margin-top:8px;font-weight:700;color:${color};font-size:.88rem">${arrow} ${Math.abs(df.d).toLocaleString('ar-SA')} ${unit} (${Math.abs(df.pct)}%)</div>
   </div>`;
 }
+// ══ الخطابات v2 ══════════════════════════════════════════════════
+let v2Data = [];
+
+async function loadV2(){
+  try{
+    const {data,error}=await supabase.from('letters').select('*')
+      .eq('status','approved').order('created_at',{ascending:false});
+    if(error) throw error;
+    v2Data=data||[];
+  }catch(e){
+    v2Data=JSON.parse(localStorage.getItem('syk_letters')||'[]')
+      .filter(l=>l.status==='approved');
+  }
+  filterV2();
+}
+
+function filterV2(){
+  const q    = document.getElementById('v2_search').value.trim().toLowerCase();
+  const day  = document.getElementById('v2_day').value;
+  const mon  = document.getElementById('v2_month').value;
+  const yr   = document.getElementById('v2_year').value;
+  const type = document.getElementById('v2_type').value;
+  const op   = document.getElementById('v2_op').value;
+
+  const filtered = v2Data.filter(l=>{
+    const d = new Date(l.created_at);
+    const matchDay  = !day  || String(d.getDate())     === day;
+    const matchMon  = mon===''|| String(d.getMonth())  === mon;
+    const matchYr   = !yr   || String(d.getFullYear()) === yr;
+    const matchType = !type || l.letter_type === type;
+    const matchOp   = !op   || l.operation   === op;
+    const matchQ    = !q    || [
+      l.letter_number, l.client_name, l.client_phone, l.responsible,
+      l.service, l.product_description, l.quantity, l.sale_price,
+      l.shipped_to_account, l.shipped_from_account,
+      l.experience_rating, l.notes, l.improvements, l.sender,
+    ].some(v=>(v||'').toLowerCase().includes(q));
+    return matchDay&&matchMon&&matchYr&&matchType&&matchOp&&matchQ;
+  });
+
+  renderV2(filtered);
+}
+
+function renderV2(list){
+  const tbody = document.getElementById('v2Body');
+  const count = document.getElementById('v2Count');
+  count.textContent = `إجمالي: ${list.length} خطاب مقبول`;
+
+  if(!list.length){
+    tbody.innerHTML=`<tr><td colspan="18" class="v2-empty">لا توجد خطابات مطابقة</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map((l,i)=>{
+    const d   = new Date(l.created_at);
+    const dateStr = d.toLocaleDateString('ar-SA',{year:'numeric',month:'2-digit',day:'2-digit'});
+    const qty  = parseFloat(l.quantity)   || 0;
+    const price= parseFloat(l.sale_price) || 0;
+    const total= qty * price;
+    const opColor = l.operation==='تم البيع' ? '#27ae60' : '#378add';
+    const typeColor= {ST:'#e8722a',LC:'#9b59b6',NO:'#e74c3c',AM:'#f0a500'}[l.letter_type]||'#888';
+
+    function cell(val){ return `<td title="${val||''}">${val||'—'}</td>`; }
+
+    return `<tr>
+      <td style="color:var(--text-muted);font-size:.75rem">${i+1}</td>
+      <td><b style="color:var(--gold)">${l.letter_number||'—'}</b>
+          <span style="display:block;font-size:.7rem;color:${typeColor};font-weight:600">${l.letter_type||''}</span></td>
+      <td style="color:var(--text-muted);font-size:.78rem">${dateStr}</td>
+      <td><span style="background:var(--card2);padding:2px 8px;border-radius:6px;font-size:.78rem;color:var(--gold)">${l.sender||'—'}</span></td>
+      <td><span style="color:${opColor};font-weight:700;font-size:.78rem">${l.operation||'—'}</span></td>
+      ${cell(l.client_name)}
+      <td style="direction:ltr;text-align:right">${l.client_phone||'—'}</td>
+      ${cell(l.responsible)}
+      ${cell(l.service)}
+      ${cell(l.product_description)}
+      <td style="text-align:center;font-weight:700">${qty||'—'}</td>
+      <td style="color:#27ae60;font-weight:700">${price?price.toLocaleString('ar-SA')+' ر.س':'—'}</td>
+      <td style="color:var(--gold);font-weight:700">${total?total.toLocaleString('ar-SA')+' ر.س':'—'}</td>
+      ${cell(l.shipped_to_account)}
+      ${cell(l.shipped_from_account)}
+      <td><span style="background:var(--card2);padding:2px 8px;border-radius:6px;font-size:.78rem">${l.experience_rating||'—'}</span></td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis" title="${l.notes||''}">${l.notes||'—'}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis" title="${l.improvements||''}">${l.improvements||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
 // ══ TOAST ══════════════════════════════════════════════════════
 function showToast(msg,err=false){
   const t=document.getElementById('toast');
