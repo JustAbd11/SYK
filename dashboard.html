@@ -755,60 +755,147 @@
           </select>
           <select id="mkt_type" onchange="loadMarketing()">
             <option value="">كل الأنواع</option>
-            <option value="ST">ST</option>
-            <option value="LC">LC</option>
-            <option value="NO">NO</option>
-            <option value="AM">AM</option>
+            <option value="ST">ST</option><option value="LC">LC</option>
+            <option value="NO">NO</option><option value="AM">AM</option>
           </select>
           <button class="btn btn-outline" onclick="loadMarketing()">🔄 تحديث</button>
         </div>
       </div>
 
-      <!-- KPIs التسويق -->
-      <div class="mkt-kpis">
-        <div class="mkt-kpi"><div class="mkt-kpi-icon">👥</div><div class="mkt-kpi-val" id="mkt_total_clients" style="color:var(--gold)">0</div><div class="mkt-kpi-lbl">إجمالي العملاء</div></div>
-        <div class="mkt-kpi"><div class="mkt-kpi-icon">🔄</div><div class="mkt-kpi-val" id="mkt_repeat_clients" style="color:#27ae60">0</div><div class="mkt-kpi-lbl">عملاء متكررون</div></div>
-        <div class="mkt-kpi"><div class="mkt-kpi-icon">🆕</div><div class="mkt-kpi-val" id="mkt_new_clients" style="color:#378add">0</div><div class="mkt-kpi-lbl">عملاء جدد</div></div>
-        <div class="mkt-kpi"><div class="mkt-kpi-icon">⭐</div><div class="mkt-kpi-val" id="mkt_avg_rating" style="color:#f0a500">0</div><div class="mkt-kpi-lbl">متوسط التقييم</div></div>
+      <!-- لوحة مؤشرات التسويق -->
+      <div class="section-card" style="margin-bottom:0">
+        <div class="section-title">📊 لوحة مؤشرات التسويق</div>
+        <div class="mkt-dash">
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">👥</div>
+            <div class="mkt-dash-val" id="mkt_total_clients" style="color:var(--gold)">0</div>
+            <div class="mkt-dash-lbl">إجمالي العملاء</div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">🔄</div>
+            <div class="mkt-dash-val" id="mkt_repeat_clients" style="color:#27ae60">0</div>
+            <div class="mkt-dash-lbl">عملاء متكررون</div>
+            <div class="mkt-dash-sub" id="mkt_retention_rate" style="color:#27ae60"></div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">🆕</div>
+            <div class="mkt-dash-val" id="mkt_new_clients" style="color:#378add">0</div>
+            <div class="mkt-dash-lbl">عملاء جدد</div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">⭐</div>
+            <div class="mkt-dash-val" id="mkt_avg_rating" style="color:#f0a500">0</div>
+            <div class="mkt-dash-lbl">متوسط التقييم</div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">💸</div>
+            <div class="mkt-dash-val" id="mkt_cac" style="color:#e74c3c">0</div>
+            <div class="mkt-dash-lbl">تكلفة اكتساب عميل (CAC)</div>
+            <div class="mkt-dash-sub" style="color:var(--text-muted)">ر.س / عميل</div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">🎯</div>
+            <div class="mkt-dash-val" id="mkt_conv_rate" style="color:#9b59b6">0%</div>
+            <div class="mkt-dash-lbl">معدل التحويل</div>
+            <div class="mkt-dash-sub" id="mkt_conv_sub" style="color:var(--text-muted)"></div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">💰</div>
+            <div class="mkt-dash-val" id="mkt_ltv" style="color:#27ae60">0</div>
+            <div class="mkt-dash-lbl">متوسط قيمة العميل (LTV)</div>
+            <div class="mkt-dash-sub" style="color:var(--text-muted)">ر.س</div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">🏷️</div>
+            <div class="mkt-dash-val" id="mkt_discount_used" style="color:#f0a500">0</div>
+            <div class="mkt-dash-lbl">خطابات بخصم</div>
+            <div class="mkt-dash-sub" id="mkt_discount_sub" style="color:var(--text-muted)"></div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">📉</div>
+            <div class="mkt-dash-val" id="mkt_discount_loss" style="color:#e74c3c">0</div>
+            <div class="mkt-dash-lbl">إجمالي الخصومات</div>
+            <div class="mkt-dash-sub" style="color:var(--text-muted)">ر.س</div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">📦</div>
+            <div class="mkt-dash-val" id="mkt_avg_order" style="color:var(--gold)">0</div>
+            <div class="mkt-dash-lbl">متوسط قيمة الطلب</div>
+            <div class="mkt-dash-sub" style="color:var(--text-muted)">ر.س</div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">📈</div>
+            <div class="mkt-dash-val" id="mkt_growth" style="color:#27ae60">—</div>
+            <div class="mkt-dash-lbl">نمو المبيعات</div>
+            <div class="mkt-dash-sub" id="mkt_growth_sub" style="color:var(--text-muted)">مقارنة بالشهر السابق</div>
+          </div>
+          <div class="mkt-dash-kpi">
+            <div class="mkt-dash-icon">🔁</div>
+            <div class="mkt-dash-val" id="mkt_repeat_rate" style="color:#378add">0%</div>
+            <div class="mkt-dash-lbl">معدل الشراء المتكرر</div>
+          </div>
+        </div>
       </div>
 
       <!-- الشبكة الرئيسية -->
       <div class="mkt-grid">
 
-        <!-- أفضل العملاء -->
         <div class="mkt-card">
           <div class="mkt-card-title">🏆 أفضل العملاء (بالحجم)</div>
           <div id="mkt_top_clients"></div>
         </div>
 
-        <!-- أكثر المنتجات طلباً -->
         <div class="mkt-card">
           <div class="mkt-card-title">🔥 أكثر المنتجات طلباً</div>
           <div id="mkt_top_products"></div>
         </div>
 
-        <!-- أداء فريق البيع -->
         <div class="mkt-card">
           <div class="mkt-card-title">👤 أداء فريق البيع</div>
           <div id="mkt_team_perf"></div>
         </div>
 
-        <!-- معدل رضا العملاء -->
         <div class="mkt-card">
           <div class="mkt-card-title">😊 رضا العملاء</div>
           <div id="mkt_satisfaction"></div>
         </div>
 
-        <!-- تحليل الحسابات المستخدمة -->
         <div class="mkt-card">
           <div class="mkt-card-title">🏦 الحسابات الأكثر استخداماً</div>
           <div id="mkt_accounts"></div>
         </div>
 
-        <!-- نشاط الخطابات بالشهر -->
         <div class="mkt-card">
           <div class="mkt-card-title">📅 نشاط الخطابات شهرياً</div>
           <canvas id="mkt_chart_activity" style="max-height:200px"></canvas>
+        </div>
+
+        <!-- تحليل أكواد الخصم -->
+        <div class="mkt-card wide">
+          <div class="mkt-card-title">🏷️ تحليل أكواد الخصم</div>
+          <div id="mkt_discount_analysis"></div>
+        </div>
+
+        <!-- تحليل المبيعات -->
+        <div class="mkt-card wide">
+          <div class="mkt-card-title">📊 تحليل المبيعات المتقدم</div>
+          <div id="mkt_sales_analysis"></div>
+        </div>
+
+        <!-- مواقع التواصل الاجتماعي -->
+        <div class="mkt-card wide">
+          <div class="mkt-card-title">📱 مواقع التواصل الاجتماعي</div>
+          <div class="social-placeholder">
+            <div style="font-size:2rem;margin-bottom:12px">📱</div>
+            <div style="font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:8px">ربط حسابات التواصل الاجتماعي</div>
+            <div style="font-size:.83rem;color:var(--text-muted);line-height:1.7">سيتم ربط حسابات المتجر (Instagram · Twitter/X · Snapchat · TikTok) عند توفير بيانات الوصول.</div>
+            <div style="margin-top:14px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+              <span style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 16px;font-size:.8rem">📷 Instagram — قريباً</span>
+              <span style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 16px;font-size:.8rem">𝕏 Twitter/X — قريباً</span>
+              <span style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 16px;font-size:.8rem">👻 Snapchat — قريباً</span>
+              <span style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 16px;font-size:.8rem">🎵 TikTok — قريباً</span>
+            </div>
+          </div>
         </div>
 
         <!-- شرائح العملاء -->
@@ -819,7 +906,7 @@
 
         <!-- توصيات تسويقية -->
         <div class="mkt-card wide">
-          <div class="mkt-card-title">💡 توصيات تسويقية</div>
+          <div class="mkt-card-title">💡 توصيات الإدارة التسويقية</div>
           <div id="mkt_tips" style="display:flex;flex-direction:column;gap:10px"></div>
         </div>
 
@@ -827,7 +914,7 @@
     </div>
   </div>
 
-  <!-- ══════════ سلة المهملات (أدمن) ══════════ -->
+    <!-- ══════════ سلة المهملات (أدمن) ══════════ -->
   <div class="tab-content" id="tab-trash">
     <div class="section-card">
       <div class="section-title">🗑️ سلة المهملات — تُحذف تلقائياً بعد 30 يوم</div>
