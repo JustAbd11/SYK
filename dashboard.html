@@ -282,14 +282,18 @@
         <div class="form-group"><label>الكمية</label><input type="text" id="f_quantity" placeholder="الكمية" oninput="calcDiscountedPrice()"></div>
         <div class="form-group"><label>سعر البيع</label><input type="text" id="f_sale_price" placeholder="مثال: 150 ريال" oninput="calcDiscountedPrice()"></div>
         <div class="form-group">
-          <label>كود الخصم</label>
+          <label>كود الخصم (اختياري)</label>
+          <input type="text" id="f_discount_code" placeholder="مثال: SAVE10" oninput="calcDiscountedPrice()" style="text-transform:uppercase">
+        </div>
+        <div class="form-group">
+          <label>نسبة الخصم %</label>
           <select id="f_discount" onchange="calcDiscountedPrice()">
             <option value="0">بدون خصم</option>
-            <option value="5">خصم 5%</option>
-            <option value="10">خصم 10%</option>
-            <option value="15">خصم 15%</option>
-            <option value="20">خصم 20%</option>
-            <option value="25">خصم 25%</option>
+            <option value="5">5%</option>
+            <option value="10">10%</option>
+            <option value="15">15%</option>
+            <option value="20">20%</option>
+            <option value="25">25%</option>
           </select>
         </div>
         <div class="form-group">
@@ -1014,6 +1018,7 @@ async function saveLetter(btn){
     client_name:val('f_client_name'), client_phone:val('f_client_phone'), responsible:val('f_responsible'),
     service:serviceVal, product_description:productDesc,
     quantity:val('f_quantity'), sale_price:val('f_sale_price'),
+    discount_code: (document.getElementById('f_discount_code').value||'').toUpperCase().trim()||null,
     discount_pct: parseFloat(document.getElementById('f_discount').value)||0,
     discounted_price: (()=>{
       const p=parseFloat(document.getElementById('f_sale_price').value)||0;
@@ -1051,6 +1056,7 @@ function resetForm(){
     .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('f_type').value='';
   document.getElementById('f_shipped_from').value='';
+  document.getElementById('f_discount_code').value='';
   document.getElementById('f_discount').value='0';
   document.getElementById('f_discounted_preview').textContent='—';
   document.getElementById('f_product_st').value='';
@@ -1934,10 +1940,11 @@ let mktData = [];
 async function loadMarketing(){
   try{
     const {data,error}=await supabase.from('letters').select('*')
-      .eq('status','approved').order('created_at',{ascending:false});
+      .neq('status','trash').order('created_at',{ascending:false});
     if(error) throw error; mktData=data||[];
   }catch(e){
-    mktData=JSON.parse(localStorage.getItem('syk_letters')||'[]').filter(l=>l.status==='approved');
+    mktData=JSON.parse(localStorage.getItem('syk_letters')||'[]')
+      .filter(l=>l.status!=='trash');
   }
   renderMarketing();
 }
@@ -1954,6 +1961,8 @@ function renderMarketing(){
       &&(!tp||l.letter_type===tp);
   });
 
+  // فقط الخطابات المقبولة للأرقام المالية
+  const approvedData = data.filter(l=>l.status==='approved');
   function amt(l){
     const base=(parseFloat(l.quantity)||0)*(parseFloat(l.sale_price)||0);
     const disc=parseFloat(l.discount_pct)||0;
@@ -1995,13 +2004,13 @@ function renderMarketing(){
   const avgRating=allRatings.length>0?(allRatings.reduce((s,r)=>s+r,0)/allRatings.length).toFixed(1):0;
 
   // ── الخصومات ──
-  const discountedLetters=data.filter(l=>parseFloat(l.discount_pct)>0);
-  const totalDiscountLoss=data.reduce((s,l)=>{
+  const discountedLetters=approvedData.filter(l=>parseFloat(l.discount_pct)>0);
+  const totalDiscountLoss=approvedData.reduce((s,l)=>{
     const base=amtBase(l), disc=parseFloat(l.discount_pct)||0;
     return s+(base*(disc/100));
   },0);
-  const totalRevenue=data.reduce((s,l)=>s+amt(l),0);
-  const avgOrder=data.length>0?totalRevenue/data.length:0;
+  const totalRevenue=approvedData.reduce((s,l)=>s+amt(l),0);
+  const avgOrder=approvedData.length>0?totalRevenue/approvedData.length:0;
 
   // CAC — نفترض تكلفة ثابتة لكل خطاب (يمكن تعديلها)
   const costPerLetter=10; // ر.س تكلفة إدارية لكل خطاب
@@ -2144,12 +2153,14 @@ function renderMarketing(){
   }
 
   // ── تحليل أكواد الخصم ──
+  // تحليل الأكواد — يجمع حسب الكود النصي أو النسبة
   const discMap={};
-  data.forEach(l=>{
+  approvedData.forEach(l=>{
     const d=parseFloat(l.discount_pct)||0;
     if(d===0) return;
-    const key=`خصم ${d}%`;
-    if(!discMap[key]) discMap[key]={pct:d,count:0,totalBase:0,totalAfter:0,totalSaved:0};
+    const code=l.discount_code||`خصم ${d}%`;
+    const key=`${code} (${d}%)`;
+    if(!discMap[key]) discMap[key]={code,pct:d,count:0,totalBase:0,totalAfter:0,totalSaved:0};
     const base=amtBase(l);
     const saved=base*(d/100);
     discMap[key].count++;
