@@ -35,6 +35,47 @@
     .trash-card .days-left{font-size:.78rem;color:#e74c3c;margin-top:4px}
     .restore-btn{margin-top:8px;background:transparent;border:1px solid #e74c3c;color:#e74c3c;padding:4px 12px;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:.78rem;transition:all .2s}
     .restore-btn:hover{background:#e74c3c;color:#fff}
+    /* ══ قسم التسويق ══ */
+    .mkt-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    @media(max-width:700px){.mkt-grid{grid-template-columns:1fr}}
+    .mkt-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+    .mkt-card.wide{grid-column:1/-1}
+    .mkt-card-title{font-size:.9rem;font-weight:700;color:var(--gold);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+    .mkt-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+    @media(max-width:700px){.mkt-kpis{grid-template-columns:repeat(2,1fr)}}
+    .mkt-kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;transition:transform .15s}
+    .mkt-kpi:hover{transform:translateY(-2px);border-color:var(--gold)}
+    .mkt-kpi-icon{font-size:1.4rem;margin-bottom:6px}
+    .mkt-kpi-val{font-size:1.2rem;font-weight:700;margin-bottom:4px}
+    .mkt-kpi-lbl{font-size:.72rem;color:var(--text-muted);line-height:1.4}
+    .mkt-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:.83rem}
+    .mkt-row:last-child{border:none}
+    .mkt-row-label{color:var(--text-muted)}
+    .mkt-row-val{font-weight:700}
+    .mkt-bar-bg{background:var(--card2);border-radius:4px;height:7px;overflow:hidden;margin-top:5px}
+    .mkt-bar-fill{height:7px;border-radius:4px;transition:width .7s ease}
+    .mkt-segment{display:flex;flex-direction:column;gap:12px}
+    .mkt-seg-item{background:var(--card2);border-radius:10px;padding:14px}
+    .mkt-seg-name{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:8px}
+    .mkt-seg-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+    .mkt-seg-stat-val{font-size:1rem;font-weight:700;color:var(--gold)}
+    .mkt-seg-stat-lbl{font-size:.7rem;color:var(--text-muted);margin-top:2px}
+    .mkt-tip{display:flex;gap:12px;align-items:flex-start;background:var(--card2);border-radius:8px;padding:12px 16px;border-right:3px solid var(--gold)}
+    .mkt-tip-icon{font-size:1.1rem;flex-shrink:0}
+    .mkt-tip-text{font-size:.83rem;color:var(--text);line-height:1.7}
+    .mkt-table{width:100%;border-collapse:collapse;font-size:.82rem}
+    .mkt-table th{background:var(--card2);color:var(--text-muted);padding:8px 12px;text-align:right;font-weight:600;font-size:.78rem;border-bottom:2px solid var(--border)}
+    .mkt-table td{padding:8px 12px;border-bottom:1px solid var(--border);text-align:right}
+    .mkt-table tr:hover td{background:rgba(232,114,42,.04)}
+    .mkt-table tr:last-child td{border:none}
+    .mkt-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .mkt-filters select{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);padding:8px 12px;font-size:.85rem;outline:none}
+    .mkt-filters select:focus{border-color:var(--gold)}
+    .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:.75rem;font-weight:700}
+    .rank-1{background:#f0a500;color:#000}
+    .rank-2{background:#aaa;color:#000}
+    .rank-3{background:#cd7f32;color:#fff}
+    .rank-n{background:var(--card2);color:var(--text-muted)}
     /* ══ جدول الخطابات v2 ══ */
     .v2-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
     .v2-toolbar input,.v2-toolbar select{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);padding:8px 12px;font-size:.85rem;outline:none}
@@ -660,6 +701,101 @@
     </div>
   </div>
 
+  <!-- ══════════ قسم التسويق (أدمن) ══════════ -->
+  <div class="tab-content" id="tab-marketing">
+    <div class="ch-wrap">
+
+      <!-- فلاتر -->
+      <div class="section-card" style="margin-bottom:0">
+        <div class="section-title">📣 قسم التسويق والعملاء</div>
+        <div class="mkt-filters">
+          <select id="mkt_year" onchange="loadMarketing()">
+            <option value="">كل السنوات</option>
+            <script>for(let y=new Date().getFullYear();y>=2026;y--)document.write(`<option value="${y}">${y}</option>`)</script>
+          </select>
+          <select id="mkt_month" onchange="loadMarketing()">
+            <option value="">كل الأشهر</option>
+            <option value="0">يناير</option><option value="1">فبراير</option>
+            <option value="2">مارس</option><option value="3">أبريل</option>
+            <option value="4">مايو</option><option value="5">يونيو</option>
+            <option value="6">يوليو</option><option value="7">أغسطس</option>
+            <option value="8">سبتمبر</option><option value="9">أكتوبر</option>
+            <option value="10">نوفمبر</option><option value="11">ديسمبر</option>
+          </select>
+          <select id="mkt_type" onchange="loadMarketing()">
+            <option value="">كل الأنواع</option>
+            <option value="ST">ST</option>
+            <option value="LC">LC</option>
+            <option value="NO">NO</option>
+            <option value="AM">AM</option>
+          </select>
+          <button class="btn btn-outline" onclick="loadMarketing()">🔄 تحديث</button>
+        </div>
+      </div>
+
+      <!-- KPIs التسويق -->
+      <div class="mkt-kpis">
+        <div class="mkt-kpi"><div class="mkt-kpi-icon">👥</div><div class="mkt-kpi-val" id="mkt_total_clients" style="color:var(--gold)">0</div><div class="mkt-kpi-lbl">إجمالي العملاء</div></div>
+        <div class="mkt-kpi"><div class="mkt-kpi-icon">🔄</div><div class="mkt-kpi-val" id="mkt_repeat_clients" style="color:#27ae60">0</div><div class="mkt-kpi-lbl">عملاء متكررون</div></div>
+        <div class="mkt-kpi"><div class="mkt-kpi-icon">🆕</div><div class="mkt-kpi-val" id="mkt_new_clients" style="color:#378add">0</div><div class="mkt-kpi-lbl">عملاء جدد</div></div>
+        <div class="mkt-kpi"><div class="mkt-kpi-icon">⭐</div><div class="mkt-kpi-val" id="mkt_avg_rating" style="color:#f0a500">0</div><div class="mkt-kpi-lbl">متوسط التقييم</div></div>
+      </div>
+
+      <!-- الشبكة الرئيسية -->
+      <div class="mkt-grid">
+
+        <!-- أفضل العملاء -->
+        <div class="mkt-card">
+          <div class="mkt-card-title">🏆 أفضل العملاء (بالحجم)</div>
+          <div id="mkt_top_clients"></div>
+        </div>
+
+        <!-- أكثر المنتجات طلباً -->
+        <div class="mkt-card">
+          <div class="mkt-card-title">🔥 أكثر المنتجات طلباً</div>
+          <div id="mkt_top_products"></div>
+        </div>
+
+        <!-- أداء فريق البيع -->
+        <div class="mkt-card">
+          <div class="mkt-card-title">👤 أداء فريق البيع</div>
+          <div id="mkt_team_perf"></div>
+        </div>
+
+        <!-- معدل رضا العملاء -->
+        <div class="mkt-card">
+          <div class="mkt-card-title">😊 رضا العملاء</div>
+          <div id="mkt_satisfaction"></div>
+        </div>
+
+        <!-- تحليل الحسابات المستخدمة -->
+        <div class="mkt-card">
+          <div class="mkt-card-title">🏦 الحسابات الأكثر استخداماً</div>
+          <div id="mkt_accounts"></div>
+        </div>
+
+        <!-- نشاط الخطابات بالشهر -->
+        <div class="mkt-card">
+          <div class="mkt-card-title">📅 نشاط الخطابات شهرياً</div>
+          <canvas id="mkt_chart_activity" style="max-height:200px"></canvas>
+        </div>
+
+        <!-- شرائح العملاء -->
+        <div class="mkt-card wide">
+          <div class="mkt-card-title">🎯 شرائح العملاء</div>
+          <div class="mkt-segment" id="mkt_segments"></div>
+        </div>
+
+        <!-- توصيات تسويقية -->
+        <div class="mkt-card wide">
+          <div class="mkt-card-title">💡 توصيات تسويقية</div>
+          <div id="mkt_tips" style="display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- ══════════ سلة المهملات (أدمن) ══════════ -->
   <div class="tab-content" id="tab-trash">
     <div class="section-card">
@@ -700,7 +836,8 @@ function buildTabs(){
       <button class="tab-btn" onclick="switchTab('list',this)">📋 المحفوظات</button>
       <button class="tab-btn" onclick="switchTab('v2',this)">📑 الخطابات v2</button>
       <button class="tab-btn" onclick="switchTab('finance',this)">💰 المالية</button>
-      <button class="tab-btn" onclick="switchTab('charts',this)">📈 لوحة التحكم</button>
+      <button class="tab-btn" onclick="switchTab('charts',this)">📈 الجدول التفاعلي</button>
+      <button class="tab-btn" onclick="switchTab('marketing',this)">📣 التسويق</button>
       <button class="tab-btn" onclick="switchTab('trash',this)">🗑️ سلة المهملات</button>`;
   } else {
     bar.innerHTML=`
@@ -717,7 +854,8 @@ function switchTab(name,btn){
   if(name==='inbox')   loadInbox();
   if(name==='trash')   loadTrash();
   if(name==='finance') loadFinance();
-  if(name==='v2')      loadV2();
+  if(name==='v2')         loadV2();
+  if(name==='marketing')  loadMarketing();
   if(name==='charts')  loadCharts();
 }
 buildTabs();
@@ -1738,6 +1876,249 @@ function renderV2(list){
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis" title="${l.improvements||''}">${l.improvements||'—'}</td>
     </tr>`;
   }).join('');
+}
+
+// ══ قسم التسويق ══════════════════════════════════════════════════
+let mktData = [];
+
+async function loadMarketing(){
+  try{
+    const {data,error}=await supabase.from('letters').select('*')
+      .eq('status','approved').order('created_at',{ascending:false});
+    if(error) throw error; mktData=data||[];
+  }catch(e){
+    mktData=JSON.parse(localStorage.getItem('syk_letters')||'[]').filter(l=>l.status==='approved');
+  }
+  renderMarketing();
+}
+
+function renderMarketing(){
+  const yr  = document.getElementById('mkt_year').value;
+  const mon = document.getElementById('mkt_month').value;
+  const tp  = document.getElementById('mkt_type').value;
+
+  const data = mktData.filter(l=>{
+    const d=new Date(l.created_at);
+    return(!yr||String(d.getFullYear())===yr)
+      &&(mon===''||String(d.getMonth())===mon)
+      &&(!tp||l.letter_type===tp);
+  });
+
+  function amt(l){return(parseFloat(l.quantity)||0)*(parseFloat(l.sale_price)||0);}
+  function fmt(n){return Number(n).toLocaleString('ar-SA');}
+  function bar(pct,color){
+    return`<div class="mkt-bar-bg"><div class="mkt-bar-fill" style="width:${Math.min(pct,100)}%;background:${color}"></div></div>`;
+  }
+  function rankBadge(i){
+    const cls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
+    return`<span class="rank-badge ${cls}">${i+1}</span>`;
+  }
+
+  // ── تجميع العملاء ──
+  const clientMap={};
+  data.forEach(l=>{
+    const k=(l.client_name||'غير محدد').trim();
+    if(!clientMap[k]) clientMap[k]={name:k,count:0,total:0,products:new Set(),ratings:[],phone:l.client_phone||'—'};
+    clientMap[k].count++;
+    clientMap[k].total+=amt(l);
+    if(l.product_description) clientMap[k].products.add(l.product_description);
+    if(l.experience_rating&&l.experience_rating!=='N/A'){
+      const r=parseFloat(l.experience_rating);
+      if(!isNaN(r)) clientMap[k].ratings.push(r);
+    }
+  });
+  const clients=Object.values(clientMap).sort((a,b)=>b.total-a.total);
+  const totalClients=clients.length;
+  const repeatClients=clients.filter(c=>c.count>1).length;
+  const newClients=clients.filter(c=>c.count===1).length;
+
+  // متوسط التقييم
+  const allRatings=data.flatMap(l=>{
+    const r=parseFloat(l.experience_rating);
+    return isNaN(r)?[]:[[r]];
+  }).flat();
+  const avgRating=allRatings.length>0?(allRatings.reduce((s,r)=>s+r,0)/allRatings.length).toFixed(1):0;
+
+  // KPIs
+  document.getElementById('mkt_total_clients').textContent  = totalClients;
+  document.getElementById('mkt_repeat_clients').textContent = repeatClients;
+  document.getElementById('mkt_new_clients').textContent    = newClients;
+  document.getElementById('mkt_avg_rating').textContent     = avgRating>0?`${avgRating}/10`:'—';
+
+  // ── أفضل العملاء ──
+  const maxTotal=clients[0]?.total||1;
+  document.getElementById('mkt_top_clients').innerHTML = clients.slice(0,8).map((cl,i)=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="display:flex;align-items:center;gap:8px">
+          ${rankBadge(i)}
+          <span style="font-size:.85rem;font-weight:700;color:var(--text)">${cl.name}</span>
+        </div>
+        <span style="font-size:.78rem;color:var(--gold);font-weight:700">${fmt(Math.round(cl.total))} ر.س</span>
+      </div>
+      <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:4px">
+        ${cl.count} خطاب · ${cl.products.size} منتج · ${cl.phone}
+      </div>
+      ${bar((cl.total/maxTotal)*100,'rgba(232,114,42,.7)')}
+    </div>`).join('')||'<div style="color:var(--text-muted);font-size:.85rem">لا توجد بيانات</div>';
+
+  // ── أكثر المنتجات طلباً ──
+  const prodMap={};
+  data.forEach(l=>{
+    const k=l.product_description||'غير محدد';
+    if(!prodMap[k]) prodMap[k]={name:k,count:0,qty:0,total:0};
+    prodMap[k].count++;
+    prodMap[k].qty+=parseFloat(l.quantity)||0;
+    prodMap[k].total+=amt(l);
+  });
+  const prods=Object.values(prodMap).sort((a,b)=>b.qty-a.qty);
+  const maxQty=prods[0]?.qty||1;
+  document.getElementById('mkt_top_products').innerHTML = prods.slice(0,8).map((p,i)=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="display:flex;align-items:center;gap:8px">
+          ${rankBadge(i)}
+          <span style="font-size:.85rem;font-weight:700;color:var(--text)">${p.name}</span>
+        </div>
+        <span style="font-size:.78rem;color:#27ae60;font-weight:700">${p.qty} وحدة</span>
+      </div>
+      <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:4px">
+        ${p.count} خطاب · ${fmt(Math.round(p.total))} ر.س إجمالي
+      </div>
+      ${bar((p.qty/maxQty)*100,'rgba(39,174,96,.7)')}
+    </div>`).join('')||'<div style="color:var(--text-muted);font-size:.85rem">لا توجد بيانات</div>';
+
+  // ── أداء فريق البيع ──
+  const teamMap={};
+  data.forEach(l=>{
+    const k=l.sender||'غير محدد';
+    if(!teamMap[k]) teamMap[k]={name:k,count:0,total:0,clients:new Set()};
+    teamMap[k].count++;
+    teamMap[k].total+=amt(l);
+    teamMap[k].clients.add((l.client_name||'').trim());
+  });
+  const team=Object.values(teamMap).sort((a,b)=>b.total-a.total);
+  const maxTeam=team[0]?.total||1;
+  document.getElementById('mkt_team_perf').innerHTML = team.map((t,i)=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="display:flex;align-items:center;gap:8px">
+          ${rankBadge(i)}
+          <span style="font-size:.85rem;font-weight:700;color:var(--text)">${t.name}</span>
+        </div>
+        <span style="font-size:.78rem;color:var(--gold);font-weight:700">${fmt(Math.round(t.total))} ر.س</span>
+      </div>
+      <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:4px">
+        ${t.count} خطاب · ${t.clients.size} عميل مختلف
+      </div>
+      ${bar((t.total/maxTeam)*100,'rgba(55,138,221,.7)')}
+    </div>`).join('')||'<div style="color:var(--text-muted);font-size:.85rem">لا توجد بيانات</div>';
+
+  // ── رضا العملاء ──
+  const ratingBuckets={'ممتاز (9-10)':0,'جيد جداً (7-8)':0,'جيد (5-6)':0,'ضعيف (1-4)':0,'بدون تقييم':0};
+  data.forEach(l=>{
+    const r=parseFloat(l.experience_rating);
+    if(isNaN(r)||l.experience_rating==='N/A') ratingBuckets['بدون تقييم']++;
+    else if(r>=9) ratingBuckets['ممتاز (9-10)']++;
+    else if(r>=7) ratingBuckets['جيد جداً (7-8)']++;
+    else if(r>=5) ratingBuckets['جيد (5-6)']++;
+    else ratingBuckets['ضعيف (1-4)']++;
+  });
+  const totalRated=data.length||1;
+  const satColors={'ممتاز (9-10)':'#27ae60','جيد جداً (7-8)':'#2ecc71','جيد (5-6)':'#f0a500','ضعيف (1-4)':'#e74c3c','بدون تقييم':'#555'};
+  document.getElementById('mkt_satisfaction').innerHTML = Object.entries(ratingBuckets).map(([k,v])=>`
+    <div class="mkt-row">
+      <span class="mkt-row-label">${k}</span>
+      <span class="mkt-row-val" style="color:${satColors[k]}">${v} (${((v/totalRated)*100).toFixed(1)}%)</span>
+    </div>
+    ${bar((v/totalRated)*100,satColors[k])}`).join('');
+
+  // ── الحسابات ──
+  const accMap={};
+  data.forEach(l=>{
+    const k=l.shipped_from_account||'غير محدد';
+    if(k==='N/A'||!k) return;
+    accMap[k]=(accMap[k]||0)+1;
+  });
+  const accs=Object.entries(accMap).sort((a,b)=>b[1]-a[1]);
+  const maxAcc=accs[0]?.[1]||1;
+  document.getElementById('mkt_accounts').innerHTML = accs.map(([k,v],i)=>`
+    <div class="mkt-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+      <div style="display:flex;justify-content:space-between;width:100%">
+        <span style="font-size:.85rem;color:var(--text);font-weight:600">${k}</span>
+        <span style="font-size:.82rem;color:var(--gold);font-weight:700">${v} مرة (${((v/data.length)*100).toFixed(1)}%)</span>
+      </div>
+      ${bar((v/maxAcc)*100,'rgba(155,89,182,.7)')}
+    </div>`).join('')||'<div style="color:var(--text-muted)">لا توجد بيانات</div>';
+
+  // ── الرسم البياني للنشاط الشهري ──
+  const monthly=Array(12).fill(0);
+  data.forEach(l=>{ monthly[new Date(l.created_at).getMonth()]++; });
+  const MAR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  if(CI['mkt_chart_activity']){CI['mkt_chart_activity'].destroy();delete CI['mkt_chart_activity'];}
+  const mktCtx=document.getElementById('mkt_chart_activity');
+  if(mktCtx){
+    CI['mkt_chart_activity']=new Chart(mktCtx,{
+      type:'line',
+      data:{labels:MAR,datasets:[{
+        label:'عدد الخطابات',data:monthly,
+        borderColor:'rgba(232,114,42,.9)',backgroundColor:'rgba(232,114,42,.1)',
+        borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#e8722a',fill:true,tension:0.3
+      }]},
+      options:{responsive:true,maintainAspectRatio:true,animation:{duration:500},
+        plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1c',bodyColor:'#eee',borderColor:'#333',borderWidth:1}},
+        scales:{x:{ticks:{color:'#888',font:{size:10}}},y:{ticks:{color:'#888',font:{size:10}},beginAtZero:true}}}
+    });
+  }
+
+  // ── شرائح العملاء ──
+  const vip=clients.filter(c=>c.count>=3);
+  const active=clients.filter(c=>c.count===2);
+  const oneTime=clients.filter(c=>c.count===1);
+
+  function segStats(arr){
+    const totalAmt=arr.reduce((s,c)=>s+c.total,0);
+    const totalOrders=arr.reduce((s,c)=>s+c.count,0);
+    return{count:arr.length,totalAmt,totalOrders,avg:arr.length>0?totalAmt/arr.length:0};
+  }
+
+  const segments=[
+    {name:'💎 VIP — أكثر من 3 خطابات',color:'#f0a500',clients:vip,stats:segStats(vip),desc:'عملاء متكررون وذوو قيمة عالية — يستحقون اهتماماً خاصاً'},
+    {name:'🟢 نشطون — خطابان',color:'#27ae60',clients:active,stats:segStats(active),desc:'عملاء بدأوا يثقون بالمتجر — مرشحون لأن يصبحوا VIP'},
+    {name:'🔵 لمرة واحدة — خطاب واحد',color:'#378add',clients:oneTime,stats:segStats(oneTime),desc:'عملاء جدد أو غير متكررين — تحتاج إلى استرداد انتباههم'},
+  ];
+
+  document.getElementById('mkt_segments').innerHTML = segments.map(seg=>`
+    <div class="mkt-seg-item" style="border-right:3px solid ${seg.color}">
+      <div class="mkt-seg-name">${seg.name}</div>
+      <div class="mkt-seg-stats">
+        <div><div class="mkt-seg-stat-val" style="color:${seg.color}">${seg.stats.count}</div><div class="mkt-seg-stat-lbl">عميل</div></div>
+        <div><div class="mkt-seg-stat-val">${seg.stats.totalOrders}</div><div class="mkt-seg-stat-lbl">خطاب</div></div>
+        <div><div class="mkt-seg-stat-val">${fmt(Math.round(seg.stats.avg))}</div><div class="mkt-seg-stat-lbl">متوسط قيمة ر.س</div></div>
+      </div>
+      <div style="font-size:.75rem;color:var(--text-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${seg.desc}</div>
+      ${seg.clients.length?`<div style="font-size:.75rem;color:var(--text-muted);margin-top:6px">
+        ${seg.clients.slice(0,5).map(c=>`<span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:2px 8px;margin-left:4px;margin-bottom:4px;display:inline-block">${c.name}</span>`).join('')}
+        ${seg.clients.length>5?`<span style="color:var(--text-muted)">+${seg.clients.length-5} آخرين</span>`:''}
+      </div>`:''}
+    </div>`).join('');
+
+  // ── توصيات تسويقية ──
+  const tips=[];
+  if(repeatClients>0) tips.push({i:'🔄',c:'#27ae60',t:`لديك ${repeatClients} عميل متكرر — تواصل معهم بعروض حصرية لزيادة ولاءهم.`});
+  if(newClients>repeatClients) tips.push({i:'🎯',c:'#378add',t:`معظم عملاءك (${newClients}) زاروا مرة واحدة — ركّز على استراتيجية الاحتفاظ بالعملاء.`});
+  if(prods[0]) tips.push({i:'🔥',c:'#e8722a',t:`المنتج "${prods[0].name}" الأكثر طلباً بـ ${prods[0].qty} وحدة — روّج له بشكل أكبر لزيادة المبيعات.`});
+  if(prods.length>1&&prods[prods.length-1].qty<(prods[0]?.qty||1)*0.2) tips.push({i:'📦',c:'#888',t:`المنتج "${prods[prods.length-1].name}" الأضعف طلباً — فكّر في تخفيض سعره أو إضافة عروض مجمّعة معه.`});
+  if(Number(avgRating)>=8) tips.push({i:'⭐',c:'#f0a500',t:`متوسط تقييم العملاء ${avgRating}/10 — ممتاز! استخدم هذا في تسويقك كدليل على رضا العملاء.`});
+  else if(Number(avgRating)>0&&Number(avgRating)<7) tips.push({i:'⚠️',c:'#e74c3c',t:`متوسط التقييم ${avgRating}/10 — يحتاج تحسين. راجع ملاحظات العملاء وسرّع أوقات التسليم.`});
+  if(vip.length>0) tips.push({i:'💎',c:'#f0a500',t:`عملاء VIP: ${vip.map(c=>c.name).slice(0,3).join('، ')}${vip.length>3?` وآخرون (${vip.length} إجمالاً)`:''} — أعطهم أولوية في الخدمة.`});
+  if(accs[0]) tips.push({i:'🏦',c:'#9b59b6',t:`الحساب الأكثر استخداماً "${accs[0][0]}" — تأكد من توفر رصيد كافٍ فيه دائماً.`});
+
+  document.getElementById('mkt_tips').innerHTML = tips.map(t=>`
+    <div class="mkt-tip" style="border-right-color:${t.c}">
+      <span class="mkt-tip-icon">${t.i}</span>
+      <span class="mkt-tip-text">${t.t}</span>
+    </div>`).join('')||'<div style="color:var(--text-muted);font-size:.85rem;padding:8px">لا توجد بيانات كافية للتوصيات.</div>';
 }
 
 // ══ TOAST ══════════════════════════════════════════════════════
