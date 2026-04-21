@@ -1115,7 +1115,10 @@ function switchTab(name,btn){
   if(name==='trash')   loadTrash();
   if(name==='finance') loadFinance();
   if(name==='v2')         loadV2();
-  if(name==='marketing')  loadMarketing();
+  if(name==='marketing'){
+    loadMarketing();
+    setTimeout(()=>{ renderBudgetList(); renderCampaignList(); renderProductCosts(); },800);
+  }
   if(name==='charts')  loadCharts();
 }
 buildTabs();
@@ -2708,14 +2711,7 @@ function saveProductCost(name){
   renderProductCosts();
 }
 
-// ── تحميل كل المدخلات عند فتح التسويق ──────────────────────────
-const _origLoadMarketing = loadMarketing;
-async function loadMarketing(){
-  await _origLoadMarketing();
-  renderBudgetList();
-  renderCampaignList();
-  renderProductCosts();
-}
+// مدخلات التسويق تُحمّل من switchTab مباشرة
 
 // ══ TOAST ══════════════════════════════════════════════════════// ══ مدخلات التسويق ══════════════════════════════════════════════
 
