@@ -2889,15 +2889,6 @@ function saveProductCost(name){
   renderProductCosts();
 }
 
-// ── تحميل كل المدخلات عند فتح التسويق ──────────────────────────
-const _origLoadMarketing = loadMarketing;
-async function loadMarketing(){
-  await _origLoadMarketing();
-  renderBudgetList();
-  renderCampaignList();
-  renderProductCosts();
-}
-
 // ══ TOAST ══════════════════════════════════════════════════════
 function showToast(msg,err=false){
   const t=document.getElementById('toast');
