@@ -85,6 +85,31 @@
     .mkt-dash-val{font-size:1.1rem;font-weight:700;margin-bottom:3px;font-variant-numeric:tabular-nums}
     .mkt-dash-lbl{font-size:.68rem;color:var(--text-muted);line-height:1.3}
     .mkt-dash-sub{font-size:.68rem;margin-top:3px}
+    /* مدخلات التسويق */
+    .mkt-input-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:600px){.mkt-input-grid{grid-template-columns:1fr}}
+    .mkt-input-group{display:flex;flex-direction:column;gap:6px}
+    .mkt-input-group label{font-size:.78rem;color:var(--text-muted);font-weight:600}
+    .mkt-input-group input,.mkt-input-group select,.mkt-input-group textarea{
+      background:var(--input-bg);border:1px solid var(--border);border-radius:7px;
+      color:var(--text);font-family:var(--font);padding:9px 12px;font-size:.88rem;outline:none}
+    .mkt-input-group input:focus,.mkt-input-group select:focus{border-color:var(--gold)}
+    .mkt-save-btn{background:var(--gold);color:#000;border:none;border-radius:8px;
+      padding:9px 22px;font-family:var(--font);font-size:.88rem;font-weight:700;cursor:pointer;transition:opacity .2s}
+    .mkt-save-btn:hover{opacity:.85}
+    .mkt-saved-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+    .mkt-saved-item{background:var(--card2);border:1px solid var(--border);border-radius:8px;
+      padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:.83rem}
+    .mkt-saved-item .msi-del{background:transparent;border:none;color:#e74c3c;cursor:pointer;font-size:.85rem;padding:2px 6px}
+    .campaign-status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.72rem;font-weight:600}
+    .cs-active{background:#0a2a0a;color:#27ae60}
+    .cs-ended{background:#2a2a2a;color:#888}
+    .cs-planned{background:#0a1a2a;color:#378add}
+    .prod-cost-table{width:100%;border-collapse:collapse;font-size:.83rem}
+    .prod-cost-table th{background:var(--card2);color:var(--text-muted);padding:8px 12px;text-align:right;font-weight:600;font-size:.78rem;border-bottom:2px solid var(--border)}
+    .prod-cost-table td{padding:8px 12px;border-bottom:1px solid var(--border);text-align:right;vertical-align:middle}
+    .prod-cost-table input{background:var(--input-bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--font);padding:5px 8px;font-size:.82rem;outline:none;width:90px}
+    .prod-cost-table input:focus{border-color:var(--gold)}
     .social-placeholder{background:var(--card2);border:1px dashed var(--border);border-radius:10px;padding:24px;text-align:center;color:var(--text-muted)}
     .discount-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:.83rem}
     .discount-row:last-child{border:none}
@@ -834,6 +859,123 @@
             <div class="mkt-dash-val" id="mkt_repeat_rate" style="color:#378add">0%</div>
             <div class="mkt-dash-lbl">معدل الشراء المتكرر</div>
           </div>
+        </div>
+      </div>
+
+      <!-- ══ ميزانية التسويق الشهرية ══ -->
+      <div class="section-card" style="margin-bottom:0">
+        <div class="section-title">💰 ميزانية التسويق الشهرية</div>
+        <div class="mkt-input-grid">
+          <div class="mkt-input-group">
+            <label>الشهر</label>
+            <select id="budget_month">
+              <option value="0">يناير</option><option value="1">فبراير</option>
+              <option value="2">مارس</option><option value="3">أبريل</option>
+              <option value="4">مايو</option><option value="5">يونيو</option>
+              <option value="6">يوليو</option><option value="7">أغسطس</option>
+              <option value="8">سبتمبر</option><option value="9">أكتوبر</option>
+              <option value="10">نوفمبر</option><option value="11">ديسمبر</option>
+            </select>
+          </div>
+          <div class="mkt-input-group">
+            <label>السنة</label>
+            <select id="budget_year">
+              <script>for(let y=new Date().getFullYear();y>=2026;y--)document.write(`<option value="${y}">${y}</option>`)</script>
+            </select>
+          </div>
+          <div class="mkt-input-group">
+            <label>الميزانية المخططة (ر.س)</label>
+            <input type="number" id="budget_planned" placeholder="مثال: 5000">
+          </div>
+          <div class="mkt-input-group">
+            <label>المصروف الفعلي (ر.س)</label>
+            <input type="number" id="budget_spent" placeholder="مثال: 3200">
+          </div>
+          <div class="mkt-input-group">
+            <label>هدف المبيعات (ر.س)</label>
+            <input type="number" id="budget_target" placeholder="مثال: 50000">
+          </div>
+          <div class="mkt-input-group">
+            <label>ملاحظات</label>
+            <input type="text" id="budget_note" placeholder="مثال: حملة رمضان">
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+          <button class="mkt-save-btn" onclick="saveBudget()">💾 حفظ الميزانية</button>
+        </div>
+        <div class="mkt-saved-list" id="budgetList"></div>
+      </div>
+
+      <!-- ══ الحملات التسويقية ══ -->
+      <div class="section-card" style="margin-bottom:0">
+        <div class="section-title">🎯 الحملات التسويقية</div>
+        <div class="mkt-input-grid">
+          <div class="mkt-input-group">
+            <label>اسم الحملة</label>
+            <input type="text" id="camp_name" placeholder="مثال: حملة رمضان 2026">
+          </div>
+          <div class="mkt-input-group">
+            <label>المنصة</label>
+            <select id="camp_platform">
+              <option value="Instagram">Instagram</option>
+              <option value="Snapchat">Snapchat</option>
+              <option value="TikTok">TikTok</option>
+              <option value="Twitter/X">Twitter/X</option>
+              <option value="Google Ads">Google Ads</option>
+              <option value="واتساب">واتساب</option>
+              <option value="أخرى">أخرى</option>
+            </select>
+          </div>
+          <div class="mkt-input-group">
+            <label>تاريخ البداية</label>
+            <input type="date" id="camp_start">
+          </div>
+          <div class="mkt-input-group">
+            <label>تاريخ النهاية</label>
+            <input type="date" id="camp_end">
+          </div>
+          <div class="mkt-input-group">
+            <label>الميزانية (ر.س)</label>
+            <input type="number" id="camp_budget" placeholder="مثال: 2000">
+          </div>
+          <div class="mkt-input-group">
+            <label>الهدف</label>
+            <input type="text" id="camp_goal" placeholder="مثال: زيادة المبيعات 30%">
+          </div>
+          <div class="mkt-input-group">
+            <label>الحالة</label>
+            <select id="camp_status">
+              <option value="planned">مخططة</option>
+              <option value="active">نشطة</option>
+              <option value="ended">منتهية</option>
+            </select>
+          </div>
+          <div class="mkt-input-group">
+            <label>النتيجة (اختياري)</label>
+            <input type="text" id="camp_result" placeholder="مثال: 150 عميل جديد">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <button class="mkt-save-btn" onclick="saveCampaign()">💾 حفظ الحملة</button>
+        </div>
+        <div class="mkt-saved-list" id="campaignList"></div>
+      </div>
+
+      <!-- ══ تكاليف المنتجات ══ -->
+      <div class="section-card" style="margin-bottom:0">
+        <div class="section-title">📦 تكلفة المنتجات الثابتة</div>
+        <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:14px">حدد التكلفة الثابتة لكل منتج عشان يحسب النظام الهامش الحقيقي تلقائياً.</p>
+        <div style="overflow-x:auto">
+          <table class="prod-cost-table" id="prodCostTable">
+            <thead><tr>
+              <th>المنتج</th>
+              <th>متوسط سعر البيع</th>
+              <th>التكلفة الثابتة (ر.س)</th>
+              <th>هامش الربح</th>
+              <th>حفظ</th>
+            </tr></thead>
+            <tbody id="prodCostBody"></tbody>
+          </table>
         </div>
       </div>
 
@@ -2394,7 +2536,369 @@ function renderMarketing(){
     </div>`).join('');
 }
 
-// ══ TOAST ══════════════════════════════════════════════════════// ══ TOAST ══════════════════════════════════════════════════════
+// ══ مدخلات التسويق ══════════════════════════════════════════════
+
+// ── ميزانية التسويق ──────────────────────────────────────────────
+function saveBudget(){
+  const month   = document.getElementById('budget_month').value;
+  const year    = document.getElementById('budget_year').value;
+  const planned = parseFloat(document.getElementById('budget_planned').value)||0;
+  const spent   = parseFloat(document.getElementById('budget_spent').value)||0;
+  const target  = parseFloat(document.getElementById('budget_target').value)||0;
+  const note    = document.getElementById('budget_note').value.trim();
+
+  if(!planned){ showToast('أدخل الميزانية المخططة',true); return; }
+
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const key = `budget_${year}_${month}`;
+  const entry = { month, year, monthName:months[+month], planned, spent, target, note, savedAt:new Date().toISOString() };
+  localStorage.setItem(key, JSON.stringify(entry));
+
+  // حفظ في قائمة الميزانيات
+  const allKeys = JSON.parse(localStorage.getItem('syk_budgets')||'[]');
+  if(!allKeys.includes(key)) allKeys.push(key);
+  localStorage.setItem('syk_budgets', JSON.stringify(allKeys));
+
+  showToast('✅ تم حفظ الميزانية');
+  ['budget_planned','budget_spent','budget_target','budget_note'].forEach(id=>document.getElementById(id).value='');
+  renderBudgetList();
+}
+
+function renderBudgetList(){
+  const allKeys = JSON.parse(localStorage.getItem('syk_budgets')||'[]');
+  const entries = allKeys.map(k=>JSON.parse(localStorage.getItem(k)||'{}')).filter(e=>e.year).sort((a,b)=>b.year-a.year||b.month-a.month);
+  const el = document.getElementById('budgetList');
+  if(!el) return;
+  if(!entries.length){ el.innerHTML='<div style="color:var(--text-muted);font-size:.82rem;padding:8px">لا توجد ميزانيات محفوظة</div>'; return; }
+  el.innerHTML = entries.map((e,i)=>{
+    const roas = e.spent>0 ? (e.planned/e.spent).toFixed(2) : '—';
+    const progress = e.target>0 ? Math.min((e.planned/e.target)*100,100).toFixed(0) : 0;
+    return `<div class="mkt-saved-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+        <b style="color:var(--gold)">${e.monthName} ${e.year}</b>
+        <button class="msi-del" onclick="deleteBudget('${allKeys[i]}')">🗑️</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;font-size:.78rem">
+        <span style="color:var(--text-muted)">مخططة: <b style="color:var(--text)">${e.planned?.toLocaleString('ar-SA')} ر.س</b></span>
+        <span style="color:var(--text-muted)">مصروفة: <b style="color:#e74c3c">${(e.spent||0).toLocaleString('ar-SA')} ر.س</b></span>
+        <span style="color:var(--text-muted)">هدف: <b style="color:#27ae60">${(e.target||0).toLocaleString('ar-SA')} ر.س</b></span>
+      </div>
+      ${e.target>0?`<div style="width:100%">
+        <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--text-muted);margin-bottom:3px"><span>التقدم نحو الهدف</span><span>${progress}%</span></div>
+        <div style="background:var(--card2);border-radius:4px;height:6px"><div style="width:${progress}%;background:${progress>=100?'#27ae60':progress>=70?'#f0a500':'#e74c3c'};height:6px;border-radius:4px;transition:width .5s"></div></div>
+      </div>`:''}
+      ${e.note?`<span style="font-size:.75rem;color:var(--text-muted)">${e.note}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+function deleteBudget(key){
+  if(!confirm('حذف هذه الميزانية؟')) return;
+  localStorage.removeItem(key);
+  const allKeys=JSON.parse(localStorage.getItem('syk_budgets')||'[]').filter(k=>k!==key);
+  localStorage.setItem('syk_budgets',JSON.stringify(allKeys));
+  renderBudgetList();
+}
+
+// ── الحملات التسويقية ──────────────────────────────────────────
+function saveCampaign(){
+  const name     = document.getElementById('camp_name').value.trim();
+  const platform = document.getElementById('camp_platform').value;
+  const start    = document.getElementById('camp_start').value;
+  const end      = document.getElementById('camp_end').value;
+  const budget   = parseFloat(document.getElementById('camp_budget').value)||0;
+  const goal     = document.getElementById('camp_goal').value.trim();
+  const status   = document.getElementById('camp_status').value;
+  const result   = document.getElementById('camp_result').value.trim();
+
+  if(!name){ showToast('أدخل اسم الحملة',true); return; }
+
+  const id = 'camp_'+Date.now();
+  const entry = {id,name,platform,start,end,budget,goal,status,result,savedAt:new Date().toISOString()};
+  localStorage.setItem(id, JSON.stringify(entry));
+
+  const allIds = JSON.parse(localStorage.getItem('syk_campaigns')||'[]');
+  allIds.push(id);
+  localStorage.setItem('syk_campaigns', JSON.stringify(allIds));
+
+  showToast('✅ تم حفظ الحملة');
+  ['camp_name','camp_start','camp_end','camp_budget','camp_goal','camp_result'].forEach(id=>document.getElementById(id).value='');
+  renderCampaignList();
+}
+
+function renderCampaignList(){
+  const allIds = JSON.parse(localStorage.getItem('syk_campaigns')||'[]');
+  const entries = allIds.map(id=>JSON.parse(localStorage.getItem(id)||'{}')).filter(e=>e.name).reverse();
+  const el = document.getElementById('campaignList');
+  if(!el) return;
+  if(!entries.length){ el.innerHTML='<div style="color:var(--text-muted);font-size:.82rem;padding:8px">لا توجد حملات محفوظة</div>'; return; }
+  const statusLabel={active:'نشطة',planned:'مخططة',ended:'منتهية'};
+  const statusClass={active:'cs-active',planned:'cs-planned',ended:'cs-ended'};
+  el.innerHTML = entries.map(e=>`
+    <div class="mkt-saved-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+        <div style="display:flex;align-items:center;gap:8px">
+          <b style="color:var(--gold)">${e.name}</b>
+          <span class="campaign-status ${statusClass[e.status]||'cs-planned'}">${statusLabel[e.status]||'مخططة'}</span>
+          <span style="font-size:.75rem;color:#378add">${e.platform}</span>
+        </div>
+        <button class="msi-del" onclick="deleteCampaign('${e.id}')">🗑️</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;font-size:.78rem">
+        ${e.start?`<span style="color:var(--text-muted)">من: <b style="color:var(--text)">${e.start}</b></span>`:''}
+        ${e.end?`<span style="color:var(--text-muted)">إلى: <b style="color:var(--text)">${e.end}</b></span>`:''}
+        ${e.budget?`<span style="color:var(--text-muted)">الميزانية: <b style="color:var(--gold)">${e.budget.toLocaleString('ar-SA')} ر.س</b></span>`:''}
+      </div>
+      ${e.goal?`<span style="font-size:.75rem;color:var(--text-muted)">🎯 ${e.goal}</span>`:''}
+      ${e.result?`<span style="font-size:.75rem;color:#27ae60">✅ النتيجة: ${e.result}</span>`:''}
+    </div>`).join('');
+}
+
+function deleteCampaign(id){
+  if(!confirm('حذف هذه الحملة؟')) return;
+  localStorage.removeItem(id);
+  const allIds=JSON.parse(localStorage.getItem('syk_campaigns')||'[]').filter(i=>i!==id);
+  localStorage.setItem('syk_campaigns',JSON.stringify(allIds));
+  renderCampaignList();
+}
+
+// ── تكاليف المنتجات ──────────────────────────────────────────
+function renderProductCosts(){
+  // اجمع كل المنتجات من الخطابات
+  const prods={};
+  mktData.forEach(l=>{
+    const k=l.product_description||'غير محدد';
+    if(k==='N/A'||!k) return;
+    if(!prods[k]) prods[k]={name:k,prices:[],count:0};
+    const p=parseFloat(l.sale_price);
+    if(!isNaN(p)) prods[k].prices.push(p);
+    prods[k].count++;
+  });
+
+  const tbody=document.getElementById('prodCostBody');
+  if(!tbody) return;
+
+  const prodList=Object.values(prods).sort((a,b)=>b.count-a.count);
+  if(!prodList.length){
+    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px">لا توجد منتجات بعد</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML=prodList.map(p=>{
+    const avgPrice=p.prices.length>0?(p.prices.reduce((s,v)=>s+v,0)/p.prices.length):0;
+    const savedCost=parseFloat(localStorage.getItem('prod_cost_'+p.name))||0;
+    const margin=avgPrice>0&&savedCost>0?((avgPrice-savedCost)/avgPrice*100).toFixed(1):null;
+    return `<tr>
+      <td><b>${p.name}</b><span style="font-size:.72rem;color:var(--text-muted);display:block">${p.count} خطاب</span></td>
+      <td style="color:var(--gold)">${avgPrice>0?avgPrice.toLocaleString('ar-SA')+' ر.س':'—'}</td>
+      <td><input type="number" placeholder="0" value="${savedCost||''}" id="pcost_${p.name.replace(/\s/g,'_')}" min="0" step="0.5"></td>
+      <td style="font-weight:700;color:${margin>=30?'#27ae60':margin>=10?'#f0a500':margin!==null?'#e74c3c':'var(--text-muted)'}">
+        ${margin!==null?margin+'%':'—'}
+      </td>
+      <td><button class="mkt-save-btn" style="padding:5px 12px;font-size:.78rem" onclick="saveProductCost('${p.name}')">حفظ</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function saveProductCost(name){
+  const id='pcost_'+name.replace(/\s/g,'_');
+  const val=parseFloat(document.getElementById(id)?.value)||0;
+  localStorage.setItem('prod_cost_'+name, val.toString());
+  showToast(`✅ تم حفظ تكلفة "${name}"`);
+  renderProductCosts();
+}
+
+// ── تحميل كل المدخلات عند فتح التسويق ──────────────────────────
+const _origLoadMarketing = loadMarketing;
+async function loadMarketing(){
+  await _origLoadMarketing();
+  renderBudgetList();
+  renderCampaignList();
+  renderProductCosts();
+}
+
+// ══ TOAST ══════════════════════════════════════════════════════// ══ مدخلات التسويق ══════════════════════════════════════════════
+
+// ── ميزانية التسويق ──────────────────────────────────────────────
+function saveBudget(){
+  const month   = document.getElementById('budget_month').value;
+  const year    = document.getElementById('budget_year').value;
+  const planned = parseFloat(document.getElementById('budget_planned').value)||0;
+  const spent   = parseFloat(document.getElementById('budget_spent').value)||0;
+  const target  = parseFloat(document.getElementById('budget_target').value)||0;
+  const note    = document.getElementById('budget_note').value.trim();
+
+  if(!planned){ showToast('أدخل الميزانية المخططة',true); return; }
+
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const key = `budget_${year}_${month}`;
+  const entry = { month, year, monthName:months[+month], planned, spent, target, note, savedAt:new Date().toISOString() };
+  localStorage.setItem(key, JSON.stringify(entry));
+
+  // حفظ في قائمة الميزانيات
+  const allKeys = JSON.parse(localStorage.getItem('syk_budgets')||'[]');
+  if(!allKeys.includes(key)) allKeys.push(key);
+  localStorage.setItem('syk_budgets', JSON.stringify(allKeys));
+
+  showToast('✅ تم حفظ الميزانية');
+  ['budget_planned','budget_spent','budget_target','budget_note'].forEach(id=>document.getElementById(id).value='');
+  renderBudgetList();
+}
+
+function renderBudgetList(){
+  const allKeys = JSON.parse(localStorage.getItem('syk_budgets')||'[]');
+  const entries = allKeys.map(k=>JSON.parse(localStorage.getItem(k)||'{}')).filter(e=>e.year).sort((a,b)=>b.year-a.year||b.month-a.month);
+  const el = document.getElementById('budgetList');
+  if(!el) return;
+  if(!entries.length){ el.innerHTML='<div style="color:var(--text-muted);font-size:.82rem;padding:8px">لا توجد ميزانيات محفوظة</div>'; return; }
+  el.innerHTML = entries.map((e,i)=>{
+    const roas = e.spent>0 ? (e.planned/e.spent).toFixed(2) : '—';
+    const progress = e.target>0 ? Math.min((e.planned/e.target)*100,100).toFixed(0) : 0;
+    return `<div class="mkt-saved-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+        <b style="color:var(--gold)">${e.monthName} ${e.year}</b>
+        <button class="msi-del" onclick="deleteBudget('${allKeys[i]}')">🗑️</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;font-size:.78rem">
+        <span style="color:var(--text-muted)">مخططة: <b style="color:var(--text)">${e.planned?.toLocaleString('ar-SA')} ر.س</b></span>
+        <span style="color:var(--text-muted)">مصروفة: <b style="color:#e74c3c">${(e.spent||0).toLocaleString('ar-SA')} ر.س</b></span>
+        <span style="color:var(--text-muted)">هدف: <b style="color:#27ae60">${(e.target||0).toLocaleString('ar-SA')} ر.س</b></span>
+      </div>
+      ${e.target>0?`<div style="width:100%">
+        <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--text-muted);margin-bottom:3px"><span>التقدم نحو الهدف</span><span>${progress}%</span></div>
+        <div style="background:var(--card2);border-radius:4px;height:6px"><div style="width:${progress}%;background:${progress>=100?'#27ae60':progress>=70?'#f0a500':'#e74c3c'};height:6px;border-radius:4px;transition:width .5s"></div></div>
+      </div>`:''}
+      ${e.note?`<span style="font-size:.75rem;color:var(--text-muted)">${e.note}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+function deleteBudget(key){
+  if(!confirm('حذف هذه الميزانية؟')) return;
+  localStorage.removeItem(key);
+  const allKeys=JSON.parse(localStorage.getItem('syk_budgets')||'[]').filter(k=>k!==key);
+  localStorage.setItem('syk_budgets',JSON.stringify(allKeys));
+  renderBudgetList();
+}
+
+// ── الحملات التسويقية ──────────────────────────────────────────
+function saveCampaign(){
+  const name     = document.getElementById('camp_name').value.trim();
+  const platform = document.getElementById('camp_platform').value;
+  const start    = document.getElementById('camp_start').value;
+  const end      = document.getElementById('camp_end').value;
+  const budget   = parseFloat(document.getElementById('camp_budget').value)||0;
+  const goal     = document.getElementById('camp_goal').value.trim();
+  const status   = document.getElementById('camp_status').value;
+  const result   = document.getElementById('camp_result').value.trim();
+
+  if(!name){ showToast('أدخل اسم الحملة',true); return; }
+
+  const id = 'camp_'+Date.now();
+  const entry = {id,name,platform,start,end,budget,goal,status,result,savedAt:new Date().toISOString()};
+  localStorage.setItem(id, JSON.stringify(entry));
+
+  const allIds = JSON.parse(localStorage.getItem('syk_campaigns')||'[]');
+  allIds.push(id);
+  localStorage.setItem('syk_campaigns', JSON.stringify(allIds));
+
+  showToast('✅ تم حفظ الحملة');
+  ['camp_name','camp_start','camp_end','camp_budget','camp_goal','camp_result'].forEach(id=>document.getElementById(id).value='');
+  renderCampaignList();
+}
+
+function renderCampaignList(){
+  const allIds = JSON.parse(localStorage.getItem('syk_campaigns')||'[]');
+  const entries = allIds.map(id=>JSON.parse(localStorage.getItem(id)||'{}')).filter(e=>e.name).reverse();
+  const el = document.getElementById('campaignList');
+  if(!el) return;
+  if(!entries.length){ el.innerHTML='<div style="color:var(--text-muted);font-size:.82rem;padding:8px">لا توجد حملات محفوظة</div>'; return; }
+  const statusLabel={active:'نشطة',planned:'مخططة',ended:'منتهية'};
+  const statusClass={active:'cs-active',planned:'cs-planned',ended:'cs-ended'};
+  el.innerHTML = entries.map(e=>`
+    <div class="mkt-saved-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+        <div style="display:flex;align-items:center;gap:8px">
+          <b style="color:var(--gold)">${e.name}</b>
+          <span class="campaign-status ${statusClass[e.status]||'cs-planned'}">${statusLabel[e.status]||'مخططة'}</span>
+          <span style="font-size:.75rem;color:#378add">${e.platform}</span>
+        </div>
+        <button class="msi-del" onclick="deleteCampaign('${e.id}')">🗑️</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;font-size:.78rem">
+        ${e.start?`<span style="color:var(--text-muted)">من: <b style="color:var(--text)">${e.start}</b></span>`:''}
+        ${e.end?`<span style="color:var(--text-muted)">إلى: <b style="color:var(--text)">${e.end}</b></span>`:''}
+        ${e.budget?`<span style="color:var(--text-muted)">الميزانية: <b style="color:var(--gold)">${e.budget.toLocaleString('ar-SA')} ر.س</b></span>`:''}
+      </div>
+      ${e.goal?`<span style="font-size:.75rem;color:var(--text-muted)">🎯 ${e.goal}</span>`:''}
+      ${e.result?`<span style="font-size:.75rem;color:#27ae60">✅ النتيجة: ${e.result}</span>`:''}
+    </div>`).join('');
+}
+
+function deleteCampaign(id){
+  if(!confirm('حذف هذه الحملة؟')) return;
+  localStorage.removeItem(id);
+  const allIds=JSON.parse(localStorage.getItem('syk_campaigns')||'[]').filter(i=>i!==id);
+  localStorage.setItem('syk_campaigns',JSON.stringify(allIds));
+  renderCampaignList();
+}
+
+// ── تكاليف المنتجات ──────────────────────────────────────────
+function renderProductCosts(){
+  // اجمع كل المنتجات من الخطابات
+  const prods={};
+  mktData.forEach(l=>{
+    const k=l.product_description||'غير محدد';
+    if(k==='N/A'||!k) return;
+    if(!prods[k]) prods[k]={name:k,prices:[],count:0};
+    const p=parseFloat(l.sale_price);
+    if(!isNaN(p)) prods[k].prices.push(p);
+    prods[k].count++;
+  });
+
+  const tbody=document.getElementById('prodCostBody');
+  if(!tbody) return;
+
+  const prodList=Object.values(prods).sort((a,b)=>b.count-a.count);
+  if(!prodList.length){
+    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px">لا توجد منتجات بعد</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML=prodList.map(p=>{
+    const avgPrice=p.prices.length>0?(p.prices.reduce((s,v)=>s+v,0)/p.prices.length):0;
+    const savedCost=parseFloat(localStorage.getItem('prod_cost_'+p.name))||0;
+    const margin=avgPrice>0&&savedCost>0?((avgPrice-savedCost)/avgPrice*100).toFixed(1):null;
+    return `<tr>
+      <td><b>${p.name}</b><span style="font-size:.72rem;color:var(--text-muted);display:block">${p.count} خطاب</span></td>
+      <td style="color:var(--gold)">${avgPrice>0?avgPrice.toLocaleString('ar-SA')+' ر.س':'—'}</td>
+      <td><input type="number" placeholder="0" value="${savedCost||''}" id="pcost_${p.name.replace(/\s/g,'_')}" min="0" step="0.5"></td>
+      <td style="font-weight:700;color:${margin>=30?'#27ae60':margin>=10?'#f0a500':margin!==null?'#e74c3c':'var(--text-muted)'}">
+        ${margin!==null?margin+'%':'—'}
+      </td>
+      <td><button class="mkt-save-btn" style="padding:5px 12px;font-size:.78rem" onclick="saveProductCost('${p.name}')">حفظ</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function saveProductCost(name){
+  const id='pcost_'+name.replace(/\s/g,'_');
+  const val=parseFloat(document.getElementById(id)?.value)||0;
+  localStorage.setItem('prod_cost_'+name, val.toString());
+  showToast(`✅ تم حفظ تكلفة "${name}"`);
+  renderProductCosts();
+}
+
+// ── تحميل كل المدخلات عند فتح التسويق ──────────────────────────
+const _origLoadMarketing = loadMarketing;
+async function loadMarketing(){
+  await _origLoadMarketing();
+  renderBudgetList();
+  renderCampaignList();
+  renderProductCosts();
+}
+
+// ══ TOAST ══════════════════════════════════════════════════════
 function showToast(msg,err=false){
   const t=document.getElementById('toast');
   t.textContent=msg; t.style.background=err?'var(--danger)':'var(--success)';
