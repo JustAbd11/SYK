@@ -927,33 +927,18 @@
           <button class="mkt-save-btn" style="margin-top:12px" onclick="saveBudget()">💾 حفظ خطة الميزانية</button>
         </div>
 
-        <!-- المرحلة 2: النتائج بعد انتهاء الشهر -->
+        <!-- المرحلة 2: النتائج التلقائية -->
         <div style="background:var(--card2);border-radius:10px;padding:16px;border-right:3px solid #27ae60">
-          <div style="font-size:.82rem;font-weight:700;color:#27ae60;margin-bottom:12px">✅ مرحلة النتائج — بعد انتهاء الشهر</div>
-          <div class="mkt-input-grid" style="grid-template-columns:repeat(3,1fr)">
-            <div class="mkt-input-group">
-              <label>اختر الميزانية المحفوظة</label>
-              <select id="budget_result_key">
+          <div style="font-size:.82rem;font-weight:700;color:#27ae60;margin-bottom:4px">✅ نتائج الشهر — تلقائية من الخطابات المقبولة</div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:12px">اختر الشهر وسيتم حساب النتائج تلقائياً من الخطابات المقبولة في نفس الفترة</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+            <div class="mkt-input-group" style="min-width:160px">
+              <label>اختر خطة الميزانية</label>
+              <select id="budget_result_key" onchange="previewBudgetResults()">
                 <option value="">اختر الشهر...</option>
               </select>
             </div>
-            <div class="mkt-input-group">
-              <label>المبيعات المحققة الفعلية (ر.س)</label>
-              <input type="number" id="budget_actual_sales" placeholder="مثال: 42000">
-            </div>
-            <div class="mkt-input-group">
-              <label>المصروف الفعلي الإجمالي (ر.س)</label>
-              <input type="number" id="budget_spent" placeholder="مثال: 4100">
-            </div>
-            <div class="mkt-input-group">
-              <label>عدد العملاء المكتسبين</label>
-              <input type="number" id="budget_clients" placeholder="مثال: 45">
-            </div>
-            <div class="mkt-input-group">
-              <label>عدد الخطابات هذا الشهر</label>
-              <input type="number" id="budget_orders" placeholder="مثال: 60">
-            </div>
-            <div class="mkt-input-group">
+            <div class="mkt-input-group" style="min-width:160px">
               <label>أفضل منصة أداءً</label>
               <select id="budget_best_platform">
                 <option value="">اختر</option>
@@ -965,12 +950,14 @@
                 <option value="واتساب">واتساب</option>
               </select>
             </div>
-            <div class="mkt-input-group" style="grid-column:1/-1">
-              <label>تقييم الشهر والدروس المستفادة</label>
-              <textarea id="budget_review" placeholder="مثال: تجاوزنا الهدف بـ 15% بفضل حملة Snapchat. الدرس: الإعلانات القصيرة أكثر فاعلية..." style="height:70px;resize:vertical"></textarea>
+            <div class="mkt-input-group" style="flex:1;min-width:200px">
+              <label>تقييم الشهر (اختياري)</label>
+              <input type="text" id="budget_review" placeholder="مثال: شهر ممتاز، تجاوزنا الهدف">
             </div>
+            <button class="mkt-save-btn" style="background:#27ae60;margin-bottom:1px" onclick="saveBudgetResults()">✅ حفظ النتائج</button>
           </div>
-          <button class="mkt-save-btn" style="margin-top:12px;background:#27ae60" onclick="saveBudgetResults()">✅ حفظ نتائج الشهر</button>
+          <!-- معاينة النتائج التلقائية -->
+          <div id="budget_preview" style="display:none"></div>
         </div>
 
         <div class="mkt-saved-list" id="budgetList" style="margin-top:16px"></div>
@@ -1030,54 +1017,45 @@
           <button class="mkt-save-btn" style="margin-top:12px" onclick="saveCampaign()">💾 حفظ خطة الحملة</button>
         </div>
 
-        <!-- مرحلة النتائج بعد انتهاء الحملة -->
+        <!-- مرحلة النتائج التلقائية للحملة -->
         <div style="background:var(--card2);border-radius:10px;padding:16px;border-right:3px solid #27ae60">
-          <div style="font-size:.82rem;font-weight:700;color:#27ae60;margin-bottom:12px">✅ نتائج الحملة — بعد الانتهاء</div>
-          <div class="mkt-input-grid" style="grid-template-columns:repeat(3,1fr)">
-            <div class="mkt-input-group">
+          <div style="font-size:.82rem;font-weight:700;color:#27ae60;margin-bottom:4px">✅ نتائج الحملة — تلقائية من الخطابات المقبولة</div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:12px">اختر الحملة وسيتم جلب الخطابات المقبولة في نفس فترتها تلقائياً</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+            <div class="mkt-input-group" style="min-width:180px">
               <label>اختر الحملة</label>
-              <select id="camp_result_key">
+              <select id="camp_result_key" onchange="previewCampaignResults()">
                 <option value="">اختر الحملة...</option>
               </select>
             </div>
-            <div class="mkt-input-group">
+            <div class="mkt-input-group" style="min-width:130px">
               <label>الحالة النهائية</label>
               <select id="camp_status">
+                <option value="ended">⚫ منتهية</option>
                 <option value="active">🟢 نشطة</option>
                 <option value="paused">🟡 موقوفة</option>
-                <option value="ended">⚫ منتهية</option>
               </select>
             </div>
-            <div class="mkt-input-group">
+            <div class="mkt-input-group" style="min-width:130px">
               <label>المصروف الفعلي (ر.س)</label>
               <input type="number" id="camp_spent" placeholder="مثال: 1800">
             </div>
-            <div class="mkt-input-group">
-              <label>عدد الوصول (Reach)</label>
+            <div class="mkt-input-group" style="min-width:130px">
+              <label>وصول الحملة (Reach)</label>
               <input type="number" id="camp_reach" placeholder="مثال: 15000">
             </div>
-            <div class="mkt-input-group">
-              <label>عدد التفاعلات</label>
+            <div class="mkt-input-group" style="min-width:130px">
+              <label>التفاعلات</label>
               <input type="number" id="camp_engage" placeholder="مثال: 850">
             </div>
-            <div class="mkt-input-group">
-              <label>عملاء جدد من الحملة</label>
-              <input type="number" id="camp_clients" placeholder="مثال: 30">
+            <div class="mkt-input-group" style="flex:1;min-width:200px">
+              <label>التقييم والدروس</label>
+              <input type="text" id="camp_result" placeholder="مثال: ROAS ممتاز، الإعلانات المرئية أفضل">
             </div>
-            <div class="mkt-input-group">
-              <label>مبيعات محققة من الحملة (ر.س)</label>
-              <input type="number" id="camp_sales" placeholder="مثال: 12000">
-            </div>
-            <div class="mkt-input-group">
-              <label>عدد الطلبات المكتسبة</label>
-              <input type="number" id="camp_orders" placeholder="مثال: 45">
-            </div>
-            <div class="mkt-input-group" style="grid-column:1/-1">
-              <label>التقييم والدروس المستفادة</label>
-              <textarea id="camp_result" placeholder="مثال: ROAS = 6x — نجحت الحملة بتجاوز الهدف. الدرس: الإعلانات المرئية القصيرة أكثر فاعلية..." style="height:70px;resize:vertical"></textarea>
-            </div>
+            <button class="mkt-save-btn" style="background:#27ae60;margin-bottom:1px" onclick="saveCampaignResults()">✅ حفظ النتائج</button>
           </div>
-          <button class="mkt-save-btn" style="margin-top:12px;background:#27ae60" onclick="saveCampaignResults()">✅ حفظ نتائج الحملة</button>
+          <!-- معاينة النتائج التلقائية -->
+          <div id="camp_preview" style="display:none"></div>
         </div>
 
         <div class="mkt-saved-list" id="campaignList" style="margin-top:16px"></div>
@@ -2698,23 +2676,84 @@ function saveBudget(){
   populateBudgetResultKeys();
 }
 
-// ميزانية — مرحلة 2: النتائج
+// ميزانية — مرحلة 2: النتائج التلقائية من الخطابات
+function calcBudgetFromLetters(month, year){
+  // جلب كل الخطابات المقبولة في هذا الشهر وهذه السنة
+  const letters = mktData.filter(l=>{
+    const d=new Date(l.created_at);
+    return l.status==='approved'
+      && String(d.getMonth())===String(month)
+      && String(d.getFullYear())===String(year);
+  });
+  const sells = letters.filter(l=>l.operation==='تم البيع');
+  const totalSales = sells.reduce((s,l)=>{
+    const base=(parseFloat(l.quantity)||0)*(parseFloat(l.sale_price)||0);
+    const disc=parseFloat(l.discount_pct)||0;
+    return s+(disc>0?base*(1-disc/100):base);
+  },0);
+  const clients = new Set(letters.map(l=>(l.client_name||'').trim()).filter(Boolean)).size;
+  return { letters:letters.length, sells:sells.length, totalSales, clients };
+}
+
+function previewBudgetResults(){
+  const key=gv('budget_result_key');
+  const preview=document.getElementById('budget_preview');
+  if(!key||!preview){if(preview)preview.style.display='none';return;}
+  const e=JSON.parse(localStorage.getItem(key)||'{}');
+  if(!e.month&&e.month!==0){preview.style.display='none';return;}
+  const auto=calcBudgetFromLetters(e.month,e.year);
+  preview.style.display='';
+  preview.innerHTML=`
+    <div style="padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">
+      <div style="font-size:.78rem;font-weight:700;color:var(--gold);margin-bottom:10px">📊 نتائج تلقائية من الخطابات المقبولة — ${e.monthName} ${e.year}</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <div style="text-align:center;background:var(--card2);border-radius:7px;padding:10px">
+          <div style="font-size:1rem;font-weight:700;color:#27ae60">${auto.totalSales.toLocaleString('ar-SA')} ر.س</div>
+          <div style="font-size:.68rem;color:var(--text-muted)">إجمالي المبيعات</div>
+        </div>
+        <div style="text-align:center;background:var(--card2);border-radius:7px;padding:10px">
+          <div style="font-size:1rem;font-weight:700;color:#f0a500">${auto.clients}</div>
+          <div style="font-size:.68rem;color:var(--text-muted)">عدد العملاء</div>
+        </div>
+        <div style="text-align:center;background:var(--card2);border-radius:7px;padding:10px">
+          <div style="font-size:1rem;font-weight:700;color:#378add">${auto.letters}</div>
+          <div style="font-size:.68rem;color:var(--text-muted)">إجمالي الخطابات</div>
+        </div>
+        <div style="text-align:center;background:var(--card2);border-radius:7px;padding:10px">
+          <div style="font-size:1rem;font-weight:700;color:#27ae60">${auto.sells}</div>
+          <div style="font-size:.68rem;color:var(--text-muted)">عمليات البيع</div>
+        </div>
+      </div>
+    </div>`;
+}
+
 function saveBudgetResults(){
   const key=gv('budget_result_key');
   if(!key){showToast('اختر الشهر أولاً',true);return;}
   const existing=JSON.parse(localStorage.getItem(key)||'{}');
   if(!existing.planned){showToast('هذا الشهر ليس له خطة محفوظة',true);return;}
-  const actualSales=gn('budget_actual_sales');
-  const spent=gn('budget_spent');
-  const clients=gn('budget_clients');
-  const orders=gn('budget_orders');
-  const roas=spent>0?(actualSales/spent).toFixed(2):null;
-  const cac=clients>0?(spent/clients).toFixed(1):null;
-  const updated={...existing,actualSales,spent,clients,orders,roas,cac,bestPlatform:gv('budget_best_platform'),review:gv('budget_review'),resultsAt:new Date().toISOString()};
+
+  // حساب النتائج تلقائياً من الخطابات
+  const auto=calcBudgetFromLetters(existing.month, existing.year);
+  const spent=gn('budget_spent')||existing.spent||0;
+  const roas=spent>0?(auto.totalSales/spent).toFixed(2):null;
+  const cac=auto.clients>0?(spent/auto.clients).toFixed(1):null;
+
+  const updated={...existing,
+    actualSales:auto.totalSales,
+    clients:auto.clients,
+    orders:auto.letters,
+    sells:auto.sells,
+    spent, roas, cac,
+    bestPlatform:gv('budget_best_platform'),
+    review:gv('budget_review'),
+    resultsAt:new Date().toISOString()
+  };
   localStorage.setItem(key,JSON.stringify(updated));
-  showToast('✅ تم حفظ نتائج الشهر');
-  ['budget_actual_sales','budget_spent','budget_clients','budget_orders','budget_review'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  showToast('✅ تم حفظ نتائج الشهر تلقائياً');
   document.getElementById('budget_result_key').value='';
+  document.getElementById('budget_preview').style.display='none';
+  document.getElementById('budget_review').value='';
   renderBudgetList();
 }
 
@@ -2822,21 +2861,91 @@ function saveCampaign(){
   renderCampaignList();populateCampaignResultKeys();
 }
 
-// الحملات — مرحلة 2: النتائج
+// الحملات — مرحلة 2: النتائج التلقائية
+function calcCampaignFromLetters(startDate, endDate){
+  const start = startDate ? new Date(startDate) : null;
+  const end   = endDate   ? new Date(endDate)   : null;
+  if(end) end.setHours(23,59,59);
+  const letters = mktData.filter(l=>{
+    if(l.status!=='approved') return false;
+    const d=new Date(l.created_at);
+    if(start && d < start) return false;
+    if(end   && d > end)   return false;
+    return true;
+  });
+  const sells = letters.filter(l=>l.operation==='تم البيع');
+  const totalSales = sells.reduce((s,l)=>{
+    const base=(parseFloat(l.quantity)||0)*(parseFloat(l.sale_price)||0);
+    const disc=parseFloat(l.discount_pct)||0;
+    return s+(disc>0?base*(1-disc/100):base);
+  },0);
+  const clients = new Set(letters.map(l=>(l.client_name||'').trim()).filter(Boolean)).size;
+  return { letters:letters.length, sells:sells.length, totalSales, clients };
+}
+
+function previewCampaignResults(){
+  const id=gv('camp_result_key');
+  const preview=document.getElementById('camp_preview');
+  if(!id||!preview){if(preview)preview.style.display='none';return;}
+  const e=JSON.parse(localStorage.getItem(id)||'{}');
+  if(!e.name){preview.style.display='none';return;}
+  const auto=calcCampaignFromLetters(e.start, e.end);
+  preview.style.display='';
+  preview.innerHTML=`
+    <div style="padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">
+      <div style="font-size:.78rem;font-weight:700;color:var(--gold);margin-bottom:10px">📊 نتائج تلقائية من الخطابات — ${e.name} (${e.start||'—'} ← ${e.end||'—'})</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <div style="text-align:center;background:var(--card2);border-radius:7px;padding:10px">
+          <div style="font-size:1rem;font-weight:700;color:#27ae60">${auto.totalSales.toLocaleString('ar-SA')} ر.س</div>
+          <div style="font-size:.68rem;color:var(--text-muted)">المبيعات المحققة</div>
+        </div>
+        <div style="text-align:center;background:var(--card2);border-radius:7px;padding:10px">
+          <div style="font-size:1rem;font-weight:700;color:#f0a500">${auto.clients}</div>
+          <div style="font-size:.68rem;color:var(--text-muted)">عدد العملاء</div>
+        </div>
+        <div style="text-align:center;background:var(--card2);border-radius:7px;padding:10px">
+          <div style="font-size:1rem;font-weight:700;color:#378add">${auto.letters}</div>
+          <div style="font-size:.68rem;color:var(--text-muted)">إجمالي الخطابات</div>
+        </div>
+        <div style="text-align:center;background:var(--card2);border-radius:7px;padding:10px">
+          <div style="font-size:1rem;font-weight:700;color:#9b59b6">${auto.sells}</div>
+          <div style="font-size:.68rem;color:var(--text-muted)">عمليات البيع</div>
+        </div>
+      </div>
+    </div>`;
+}
+
 function saveCampaignResults(){
   const id=gv('camp_result_key');
   if(!id){showToast('اختر الحملة أولاً',true);return;}
   const existing=JSON.parse(localStorage.getItem(id)||'{}');
   if(!existing.name){showToast('الحملة غير موجودة',true);return;}
-  const spent=gn('camp_spent'), sales=gn('camp_sales'), clients=gn('camp_clients'), reach=gn('camp_reach');
-  const roas=spent>0?(sales/spent).toFixed(2):null;
-  const cac=clients>0?(spent/clients).toFixed(1):null;
-  const convRate=reach>0?((clients/reach)*100).toFixed(2):null;
-  const updated={...existing,status:gv('camp_status'),spent,reach,engage:gn('camp_engage'),clients,sales,orders:gn('camp_orders'),roas,cac,convRate,result:gv('camp_result'),resultsAt:new Date().toISOString()};
+
+  // حساب النتائج تلقائياً من الخطابات في فترة الحملة
+  const auto=calcCampaignFromLetters(existing.start, existing.end);
+  const spent=gn('camp_spent')||existing.spent||0;
+  const reach=gn('camp_reach')||0;
+  const engage=gn('camp_engage')||0;
+  const roas=spent>0?(auto.totalSales/spent).toFixed(2):null;
+  const cac=auto.clients>0?(spent/auto.clients).toFixed(1):null;
+  const convRate=reach>0?((auto.clients/reach)*100).toFixed(2):null;
+
+  const updated={...existing,
+    status:gv('camp_status')||'ended',
+    spent, reach, engage,
+    clients:auto.clients,
+    sales:auto.totalSales,
+    orders:auto.letters,
+    sells:auto.sells,
+    roas, cac, convRate,
+    result:gv('camp_result'),
+    resultsAt:new Date().toISOString()
+  };
   localStorage.setItem(id,JSON.stringify(updated));
-  showToast('✅ تم حفظ نتائج الحملة');
-  ['camp_spent','camp_reach','camp_engage','camp_clients','camp_sales','camp_orders','camp_result'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  showToast('✅ تم حفظ نتائج الحملة تلقائياً');
   document.getElementById('camp_result_key').value='';
+  document.getElementById('camp_preview').style.display='none';
+  document.getElementById('camp_result').value='';
   renderCampaignList();
 }
 
