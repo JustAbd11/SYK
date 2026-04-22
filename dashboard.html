@@ -1631,46 +1631,86 @@ function renderFinance(){
   const sellRows = filtered.filter(l=>l.operation==='تم البيع');
 
   // دمج نفس المنتج في صف واحد
-  function mergeRows(rows){
-    const map={};
+function mergeRows(rows){
+    // نجمع حسب المنتج + السعر بعد الخصم
+    // نفس المنتج بنفس السعر = صف واحد
+    // نفس المنتج بسعر مختلف (خصم مختلف) = صف منفصل مع رقم فرعي
+    const productCount = {};
+    const map = {};
+
     rows.forEach(r=>{
-      const key = r.product_description||'غير محدد';
+      const prod  = r.product_description || 'غير محدد';
       const qty   = parseFloat(r.quantity)   || 0;
       const price = parseFloat(r.sale_price) || 0;
-      if(!map[key]){ map[key]={ product:key, qty:0, price, total:0, count:0 }; }
+      const disc  = parseFloat(r.discount_pct) || 0;
+      const finalPrice = disc > 0 ? +(price * (1 - disc/100)).toFixed(2) : price;
+      const key   = `${prod}||${finalPrice}`;
+
+      if(!map[key]){
+        // أول مرة نشوف هذا المنتج بهذا السعر
+        if(!productCount[prod]) productCount[prod] = 0;
+        productCount[prod]++;
+        map[key] = {
+          product: prod,
+          subIndex: productCount[prod], // 1 للأول، 2 للثاني، إلخ
+          qty: 0, price: finalPrice,
+          disc, total: 0, count: 0
+        };
+      }
       map[key].qty   += qty;
-      map[key].total += qty * price;
+      map[key].total += qty * finalPrice;
       map[key].count++;
     });
-    return Object.values(map);
+
+    // رتّب: نفس المنتج مع بعض
+    return Object.values(map).sort((a,b)=>
+      a.product.localeCompare(b.product,'ar') || a.price - b.price
+    );
   }
 
   function buildMergedRows(rows, tbodyId, colorClass){
     const merged = mergeRows(rows);
     const tbody  = document.getElementById(tbodyId);
     if(!merged.length){
-      tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px">لا توجد بيانات</td></tr>`;
+      tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px">لا توجد بيانات</td></tr>`;
       return 0;
     }
-    let grandTotal=0;
-    tbody.innerHTML=merged.map(r=>{
-      grandTotal+=r.total;
+
+    // نعرف أي منتجات عندها أكثر من سعر واحد
+    const multiPrice = {};
+    merged.forEach(r=>{ multiPrice[r.product] = (multiPrice[r.product]||0)+1; });
+
+    let grandTotal = 0;
+    let grandQty   = 0;
+
+    tbody.innerHTML = merged.map(r=>{
+      grandTotal += r.total;
+      grandQty   += r.qty;
+      const hasMulti = multiPrice[r.product] > 1;
+      const nameDisplay = hasMulti
+        ? `${r.product} <span style="color:var(--text-muted);font-size:.75rem;font-weight:400">${r.subIndex}.${r.subIndex > 1 ? r.subIndex-1 : 1}</span>`
+        : r.product;
+      const discBadge = r.disc > 0
+        ? `<span style="background:#2a1a00;color:#f0a500;border-radius:6px;padding:1px 7px;font-size:.72rem;margin-right:4px">خصم ${r.disc}%</span>`
+        : '';
       return `<tr>
-        <td>${r.product}</td>
-        <td>${r.qty}</td>
-        <td>${r.price} ر.س</td>
+        <td>${nameDisplay}${discBadge}</td>
+        <td style="text-align:center;font-weight:700">${r.qty}</td>
+        <td>${r.price.toLocaleString('ar-SA')} ر.س</td>
         <td style="font-weight:700;color:${colorClass}">${r.total.toLocaleString('ar-SA')} ر.س</td>
       </tr>`;
     }).join('');
-    return grandTotal;
+
+    return { total: grandTotal, qty: grandQty };
   }
 
-  const buyTotal  = buildMergedRows(buyRows,  'buyTableBody',  '#378add');
-  const sellTotal = buildMergedRows(sellRows, 'sellTableBody', '#27ae60');
+const buyResult  = buildMergedRows(buyRows,  'buyTableBody',  '#378add');
+  const sellResult = buildMergedRows(sellRows, 'sellTableBody', '#27ae60');
+  const buyTotal   = buyResult.total;
+  const sellTotal  = sellResult.total;
 
-  document.getElementById('buyTotalRow').innerHTML  =`<td colspan="3" style="font-weight:700">الإجمالي</td><td style="color:#378add;font-weight:700">${buyTotal.toLocaleString('ar-SA')} ر.س</td>`;
-  document.getElementById('sellTotalRow').innerHTML =`<td colspan="3" style="font-weight:700">الإجمالي</td><td style="color:#27ae60;font-weight:700">${sellTotal.toLocaleString('ar-SA')} ر.س</td>`;
-
+  document.getElementById('buyTotalRow').innerHTML  =`<td style="font-weight:700">الإجمالي</td><td style="text-align:center;font-weight:700;color:#378add">${buyResult.qty}</td><td></td><td style="color:#378add;font-weight:700">${buyTotal.toLocaleString('ar-SA')} ر.س</td>`;
+  document.getElementById('sellTotalRow').innerHTML =`<td style="font-weight:700">الإجمالي</td><td style="text-align:center;font-weight:700;color:#27ae60">${sellResult.qty}</td><td></td><td style="color:#27ae60;font-weight:700">${sellTotal.toLocaleString('ar-SA')} ر.س</td>`;
   document.getElementById('buy_count').textContent  = `${buyRows.length} خطاب`;
   document.getElementById('sell_count').textContent = `${sellRows.length} خطاب`;
 
