@@ -1193,15 +1193,11 @@ function logout(){ sessionStorage.clear(); window.location.href='index.html'; }
 
 // ─── دالة مساعدة: تحويل اسم المنتج حسب الخصم ───
 function getProductVersion(productName, discountPct) {
+  if (!productName || productName === 'N/A' || productName === 'غير محدد') return productName || 'غير محدد';
   if (!discountPct || discountPct === 0) return productName + ' 1.0';
   
-  // تحديد الإصدار حسب نسبة الخصم
   const versionMap = {
-    5: '1.1',
-    10: '1.2', 
-    15: '1.3',
-    20: '1.4',
-    25: '1.5'
+    5: '1.1', 10: '1.2', 15: '1.3', 20: '1.4', 25: '1.5'
   };
   
   const version = versionMap[discountPct] || '1.0';
@@ -1470,9 +1466,11 @@ function renderLetters(list){
     const d=new Date(l.created_at);
     const hasR=l.receipt_url?'🧾':'';
     const sb=l.status==='approved'?'<span class="status-badge status-approved">✅ مقبول</span>':'<span class="status-badge status-pending">⏳ مراجعة</span>';
+    const productVer = getProductVersion(l.product_description, parseFloat(l.discount_pct)||0);
     return `<div class="letter-card" onclick="openLetter('${l.id}')">
       <div class="lc-number">${l.letter_number} ${hasR}</div>
       <div class="lc-client">${l.client_name}</div>
+      <div style="font-size:.78rem;color:var(--text-muted);margin-top:2px">📦 ${productVer}</div>
       <div class="lc-date">${d.toLocaleDateString('ar-SA')}</div>
       <div style="margin-top:4px;font-size:.75rem;color:var(--text-muted)">من: <b style="color:var(--gold)">${l.sender||'Admin'}</b>${l.operation?` · ${l.operation}`:''}</div>
       <div style="margin-top:4px">${sb}</div>
@@ -2424,18 +2422,32 @@ function renderMarketing(){
       ${bar((cl.total/maxTotal)*100,'rgba(232,114,42,.7)')}
     </div>`).join('')||'<div style="color:var(--text-muted);font-size:.85rem">لا توجد بيانات</div>';
 
-  // ── أكثر المنتجات ──
+  // ── أكثر المنتجات (مع الإصدارات) ──
   const prodMap={};
+  let totalQuantity = 0;
+  
   data.forEach(l=>{
-    const k=l.product_description||'غير محدد';
+    const baseName = l.product_description||'غير محدد';
+    const discountPct = parseFloat(l.discount_pct)||0;
+    const k = getProductVersion(baseName, discountPct);
+    
     if(!prodMap[k]) prodMap[k]={name:k,count:0,qty:0,total:0};
     prodMap[k].count++;
-    prodMap[k].qty+=parseFloat(l.quantity)||0;
+    const qty = parseFloat(l.quantity)||0;
+    prodMap[k].qty += qty;
     prodMap[k].total+=amt(l);
+    totalQuantity += qty;
   });
+  
   const prods=Object.values(prodMap).sort((a,b)=>b.qty-a.qty);
   const maxQty=prods[0]?.qty||1;
-  document.getElementById('mkt_top_products').innerHTML=prods.slice(0,8).map((p,i)=>`
+  
+  document.getElementById('mkt_top_products').innerHTML=`
+    <div style="background:var(--card2);border-radius:8px;padding:12px;margin-bottom:14px;text-align:center">
+      <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:4px">📊 إجمالي الكمية</div>
+      <div style="font-size:1.4rem;font-weight:700;color:var(--gold)">${fmt(Math.round(totalQuantity))} وحدة</div>
+    </div>
+  ` + (prods.slice(0,8).map((p,i)=>`
     <div style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
         <div style="display:flex;align-items:center;gap:8px">${rankBadge(i)}<span style="font-size:.85rem;font-weight:700;color:var(--text)">${p.name}</span></div>
@@ -2443,7 +2455,7 @@ function renderMarketing(){
       </div>
       <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:4px">${p.count} خطاب · ${fmt(Math.round(p.total))} ر.س</div>
       ${bar((p.qty/maxQty)*100,'rgba(39,174,96,.7)')}
-    </div>`).join('')||'<div style="color:var(--text-muted);font-size:.85rem">لا توجد بيانات</div>';
+    </div>`).join('')||'<div style="color:var(--text-muted);font-size:.85rem">لا توجد بيانات</div>');
 
   // ── فريق البيع ──
   const teamMap={};
