@@ -249,29 +249,15 @@
         <div style="display:none"><select id="f_year"></select></div>
       </div>
       <div class="auto-letter-num" id="autoLetterNum">اختر النوع</div>
-      <div class="auto-letter-hint">الرقم التسلسلي تلقائي — يصل لـ 1000 ويبدأ من جديد مع كل سنة</div>
+      <div class="auto-letter-hint">الرقم التسلسلي تلقائي — يبدأ من جديد مع كل سنة جديدة</div>
     </div>
 
-    <div class="section-card">
-      <div class="section-title">بيانات العميل</div>
-      <div class="form-grid">
-        <div class="form-group"><label>الاسم</label><input type="text" id="f_client_name" placeholder="اسم العميل"></div>
-        <div class="form-group"><label>الجوال</label><input type="text" id="f_client_phone" placeholder="05XXXXXXXX"></div>
-        <div class="form-group full"><label>المسؤول</label><input type="text" id="f_responsible" placeholder="اسم المسؤول"></div>
-      </div>
-    </div>
+
 
     <div class="section-card">
       <div class="section-title">تفاصيل المنتج الرقمي</div>
       <div class="form-grid">
-        <div class="form-group full">
-          <label>نوع العملية</label>
-          <div class="toggle-group">
-            <div class="toggle-opt active" id="opt_sale" onclick="selectOp('sale')">تم البيع</div>
-            <div class="toggle-opt" id="opt_buy" onclick="selectOp('buy')">تم الشراء</div>
-          </div>
-          <input type="hidden" id="f_operation" value="تم البيع">
-        </div>
+
         <!-- الخدمة — قائمة ديناميكية -->
         <div class="form-group" id="desc_normal">
           <label>الخدمة</label>
@@ -306,25 +292,7 @@
       <div class="form-grid">
         <div class="form-group"><label>الكمية</label><input type="text" id="f_quantity" placeholder="الكمية" oninput="calcDiscountedPrice()"></div>
         <div class="form-group"><label>سعر البيع</label><input type="text" id="f_sale_price" placeholder="مثال: 150 ريال" oninput="calcDiscountedPrice()"></div>
-        <div class="form-group">
-          <label>كود الخصم (اختياري)</label>
-          <input type="text" id="f_discount_code" placeholder="مثال: SAVE10" oninput="calcDiscountedPrice()" style="text-transform:uppercase">
-        </div>
-        <div class="form-group">
-          <label>نسبة الخصم %</label>
-          <select id="f_discount" onchange="calcDiscountedPrice()">
-            <option value="0">بدون خصم</option>
-            <option value="5">5%</option>
-            <option value="10">10%</option>
-            <option value="15">15%</option>
-            <option value="20">20%</option>
-            <option value="25">25%</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>السعر بعد الخصم</label>
-          <div id="f_discounted_preview" style="background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:10px 13px;font-size:.95rem;color:var(--gold);font-weight:700">—</div>
-        </div>
+
         <div class="form-group full">
           <label>تم الشحن من حساب (صاحب المتجر)</label>
           <select id="f_shipped_from">
@@ -339,14 +307,7 @@
       </div>
     </div>
 
-    <div class="section-card">
-      <div class="section-title">تقييم العميل (المراجعة السنوية)</div>
-      <div class="form-grid">
-        <div class="form-group"><label>تقييم التجربة</label><input type="text" id="f_rating" placeholder="ممتاز / جيد / متوسط"></div>
-        <div class="form-group"><label>الملاحظات</label><textarea id="f_notes" placeholder="ملاحظات..."></textarea></div>
-        <div class="form-group"><label>التحسينات</label><textarea id="f_improvements" placeholder="مقترحات..."></textarea></div>
-      </div>
-    </div>
+
 
     <div class="section-card">
       <div class="section-title">صورة الايصال</div>
@@ -472,7 +433,6 @@
               <th>المجموع</th>
               <th>شحن للحساب</th>
               <th>شحن من حساب</th>
-              <th>تقييم التجربة</th>
               <th>ملاحظات</th>
               <th>التحسينات</th>
             </tr>
@@ -807,11 +767,7 @@
             <div class="mkt-dash-val" id="mkt_new_clients" style="color:#378add">0</div>
             <div class="mkt-dash-lbl">عملاء جدد</div>
           </div>
-          <div class="mkt-dash-kpi">
-            <div class="mkt-dash-icon">⭐</div>
-            <div class="mkt-dash-val" id="mkt_avg_rating" style="color:#f0a500">0</div>
-            <div class="mkt-dash-lbl">متوسط التقييم</div>
-          </div>
+
           <div class="mkt-dash-kpi">
             <div class="mkt-dash-icon">💸</div>
             <div class="mkt-dash-val" id="mkt_cac" style="color:#e74c3c">0</div>
@@ -830,18 +786,7 @@
             <div class="mkt-dash-lbl">متوسط قيمة العميل (LTV)</div>
             <div class="mkt-dash-sub" style="color:var(--text-muted)">ر.س</div>
           </div>
-          <div class="mkt-dash-kpi">
-            <div class="mkt-dash-icon">🏷️</div>
-            <div class="mkt-dash-val" id="mkt_discount_used" style="color:#f0a500">0</div>
-            <div class="mkt-dash-lbl">خطابات بخصم</div>
-            <div class="mkt-dash-sub" id="mkt_discount_sub" style="color:var(--text-muted)"></div>
-          </div>
-          <div class="mkt-dash-kpi">
-            <div class="mkt-dash-icon">📉</div>
-            <div class="mkt-dash-val" id="mkt_discount_loss" style="color:#e74c3c">0</div>
-            <div class="mkt-dash-lbl">إجمالي الخصومات</div>
-            <div class="mkt-dash-sub" style="color:var(--text-muted)">ر.س</div>
-          </div>
+
           <div class="mkt-dash-kpi">
             <div class="mkt-dash-icon">📦</div>
             <div class="mkt-dash-val" id="mkt_avg_order" style="color:var(--gold)">0</div>
@@ -1101,10 +1046,7 @@
           <div id="mkt_team_perf"></div>
         </div>
 
-        <div class="mkt-card">
-          <div class="mkt-card-title">😊 رضا العملاء</div>
-          <div id="mkt_satisfaction"></div>
-        </div>
+
 
         <div class="mkt-card">
           <div class="mkt-card-title">🏦 الحسابات الأكثر استخداماً</div>
@@ -1116,11 +1058,7 @@
           <canvas id="mkt_chart_activity" style="max-height:200px"></canvas>
         </div>
 
-        <!-- تحليل أكواد الخصم -->
-        <div class="mkt-card wide">
-          <div class="mkt-card-title">🏷️ تحليل أكواد الخصم</div>
-          <div id="mkt_discount_analysis"></div>
-        </div>
+
 
         <!-- تحليل المبيعات -->
         <div class="mkt-card wide">
@@ -1293,15 +1231,15 @@ async function fetchNextNumber(){
       .neq('status','trash').order('created_at',{ascending:false}).limit(1);
     if(error) throw error;
     let next = 1;
-    if(data&&data.length>0){ const last=parseInt(data[0].letter_prefix)||0; next=last>=1000?1:last+1; }
-    const prefix = String(next).padStart(3,'0');
+    if(data&&data.length>0){ const last=parseInt(data[0].letter_prefix)||0; next=last+1; }
+    const prefix = String(next).padStart(3,'0'); // لا حد أقصى — يتجدد مع كل سنة
     currentLetterNum={prefix,type,year};
     document.getElementById('autoLetterNum').textContent=`${prefix}-${type}-${year}`;
   } catch(e){
     const local=JSON.parse(localStorage.getItem('syk_letters')||'[]')
       .filter(l=>l.letter_type===type&&l.letter_year===year&&l.status!=='trash');
     let next=1;
-    if(local.length>0){ const last=Math.max(...local.map(l=>parseInt(l.letter_prefix)||0)); next=last>=1000?1:last+1; }
+    if(local.length>0){ const last=Math.max(...local.map(l=>parseInt(l.letter_prefix)||0)); next=last+1; }
     const prefix=String(next).padStart(3,'0');
     currentLetterNum={prefix,type,year};
     document.getElementById('autoLetterNum').textContent=`${prefix}-${type}-${year}`;
@@ -1309,25 +1247,7 @@ async function fetchNextNumber(){
 }
 
 // ══ بيع/شراء ══════════════════════════════════════════════════
-function calcDiscountedPrice(){
-  const price = parseFloat(document.getElementById('f_sale_price').value)||0;
-  const qty   = parseFloat(document.getElementById('f_quantity').value)||0;
-  const disc  = parseFloat(document.getElementById('f_discount').value)||0;
-  const el    = document.getElementById('f_discounted_preview');
-  if(!price||!qty){ el.textContent='—'; return; }
-  const original = price * qty;
-  const discAmt  = original * (disc/100);
-  const final    = original - discAmt;
-  el.textContent = disc>0
-    ? `${final.toLocaleString('ar-SA')} ر.س (وفّرت ${discAmt.toLocaleString('ar-SA')} ر.س)`
-    : `${original.toLocaleString('ar-SA')} ر.س`;
-}
 
-function selectOp(op){
-  document.getElementById('opt_sale').classList.toggle('active',op==='sale');
-  document.getElementById('opt_buy').classList.toggle('active',op==='buy');
-  document.getElementById('f_operation').value = op==='sale'?'تم البيع':'تم الشراء';
-}
 
 
 
@@ -1356,20 +1276,10 @@ async function saveLetter(btn){
   const data={
     letter_number:letterNum, letter_prefix:prefix, letter_type:type, letter_year:year,
     sender:CURRENT_DISPLAY, status:'pending',
-    operation:val('f_operation'),
-    client_name:val('f_client_name'), client_phone:val('f_client_phone'), responsible:val('f_responsible'),
     service:serviceVal, product_description:productDesc,
     quantity:val('f_quantity'), sale_price:val('f_sale_price'),
-    discount_code: (document.getElementById('f_discount_code').value||'').toUpperCase().trim()||null,
-    discount_pct: parseFloat(document.getElementById('f_discount').value)||0,
-    discounted_price: (()=>{
-      const p=parseFloat(document.getElementById('f_sale_price').value)||0;
-      const q=parseFloat(document.getElementById('f_quantity').value)||0;
-      const d=parseFloat(document.getElementById('f_discount').value)||0;
-      return d>0 ? +(p*(1-d/100)*q).toFixed(2) : p*q;
-    })(),
     shipped_to_account:val('f_shipped_to'), shipped_from_account:val('f_shipped_from'),
-    experience_rating:val('f_rating'), notes:val('f_notes'), improvements:val('f_improvements'),
+    notes:val('f_notes'),
     receipt_url:null,
   };
   const receiptFile=document.getElementById('f_receipt').files[0];
@@ -1393,14 +1303,11 @@ async function saveLetter(btn){
   resetForm();
 }
 function resetForm(){
-  ['f_client_name','f_client_phone','f_responsible','f_service','f_product_description',
-   'f_quantity','f_sale_price','f_shipped_to','f_rating','f_notes','f_improvements']
+  ['f_service','f_product_description','f_quantity','f_sale_price','f_shipped_to','f_notes']
     .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('f_type').value='';
   document.getElementById('f_shipped_from').value='';
-  document.getElementById('f_discount_code').value='';
-  document.getElementById('f_discount').value='0';
-  document.getElementById('f_discounted_preview').textContent='—';
+
   document.getElementById('f_product_st').value='';
   document.getElementById('f_product_description').value='';
   if(document.getElementById('f_service_st')) document.getElementById('f_service_st').value='';
@@ -1410,7 +1317,7 @@ function resetForm(){
   document.getElementById('autoLetterNum').textContent='اختر النوع';
   document.getElementById('receiptPreview').style.display='none';
   document.getElementById('receiptLabel').textContent='📎 انقر لرفع الايصال';
-  selectOp('sale'); receiptDataURL=null; currentLetterNum=null;
+  receiptDataURL=null; currentLetterNum=null;
 }
 
 // ══ صندوق الوارد ══════════════════════════════════════════════
@@ -1457,7 +1364,7 @@ function renderLetters(list){
       <div class="lc-number">${l.letter_number} ${hasR}</div>
       <div class="lc-client">${l.client_name}</div>
       <div class="lc-date">${d.toLocaleDateString('ar-SA')}</div>
-      <div style="margin-top:4px;font-size:.75rem;color:var(--text-muted)">من: <b style="color:var(--gold)">${l.sender||'Admin'}</b>${l.operation?` · ${l.operation}`:''}</div>
+      <div style="margin-top:4px;font-size:.75rem;color:var(--text-muted)">من: <b style="color:var(--gold)">${l.sender||'Admin'}</b></div>
       <div style="margin-top:4px">${sb}</div>
     </div>`;
   }).join('');
@@ -1485,18 +1392,16 @@ function openLetter(id){
       <div class="section-title" style="margin:0">📄 ${l.letter_number}</div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         ${sb}<span style="font-size:.82rem;color:var(--text-muted)">من: <b style="color:var(--gold)">${l.sender||'Admin'}</b></span>
-        ${l.operation?`<span style="font-size:.82rem;background:var(--card2);padding:3px 10px;border-radius:20px;color:var(--gold)">${l.operation}</span>`:''}
+
       </div>
     </div>
     <div class="form-grid" style="margin-bottom:16px">
-      ${ef('client_name','الاسم',l.client_name,id)}${ef('client_phone','الجوال',l.client_phone,id)}
-      ${ef('responsible','المسؤول',l.responsible,id)}${ef('service','الخدمة',l.service,id)}
+      ${ef('service','الخدمة',l.service,id)}
       ${ef('product_description','وصف المنتج',l.product_description,id)}${ef('quantity','الكمية',l.quantity,id)}
-      ${ef('sale_price','سعر البيع',l.sale_price,id)}
-      ${ef('shipped_to_account','شحن للحساب (العميل)',l.shipped_to_account,id)}
-      ${ef('shipped_from_account','شحن من حساب (المتجر)',l.shipped_from_account,id)}
-      ${ef('experience_rating','تقييم التجربة',l.experience_rating,id)}
-      ${ef('notes','الملاحظات',l.notes,id,'full')}${ef('improvements','التحسينات',l.improvements,id,'full')}
+      ${ef('sale_price','السعر',l.sale_price,id)}
+      ${ef('shipped_to_account','شحن للحساب',l.shipped_to_account,id)}
+      ${ef('shipped_from_account','شحن من حساب',l.shipped_from_account,id)}
+      ${ef('notes','الملاحظات',l.notes,id,'full')}
     </div>
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
       ${ab}
@@ -1519,7 +1424,7 @@ async function approveLetter(id){
   if(document.getElementById('tab-marketing').classList.contains('active')) loadMarketing();
 }
 async function updateLetter(id){
-  const keys=['client_name','client_phone','responsible','service','product_description','quantity','sale_price','shipped_to_account','shipped_from_account','experience_rating','notes','improvements'];
+  const keys=['service','product_description','quantity','sale_price','shipped_to_account','shipped_from_account','notes'];
   const updates={updated_at:new Date().toISOString()};
   keys.forEach(k=>{ const el=document.getElementById(`edit_${k}_${id}`); if(el) updates[k]=el.value.trim()||'N/A'; });
   try{ const {error}=await supabase.from('letters').update(updates).eq('id',id); if(error) throw error; }
@@ -2234,10 +2139,9 @@ function filterV2(){
     const matchType = !type || l.letter_type === type;
     const matchOp   = !op   || l.operation   === op;
     const matchQ    = !q    || [
-      l.letter_number, l.client_name, l.client_phone, l.responsible,
-      l.service, l.product_description, l.quantity, l.sale_price,
-      l.shipped_to_account, l.shipped_from_account,
-      l.experience_rating, l.notes, l.improvements, l.sender,
+      l.letter_number, l.service, l.product_description,
+      l.quantity, l.sale_price, l.shipped_to_account,
+      l.shipped_from_account, l.notes, l.sender,
     ].some(v=>(v||'').toLowerCase().includes(q));
     return matchDay&&matchMon&&matchYr&&matchType&&matchOp&&matchQ;
   });
@@ -2272,10 +2176,6 @@ function renderV2(list){
           <span style="display:block;font-size:.7rem;color:${typeColor};font-weight:600">${l.letter_type||''}</span></td>
       <td style="color:var(--text-muted);font-size:.78rem">${dateStr}</td>
       <td><span style="background:var(--card2);padding:2px 8px;border-radius:6px;font-size:.78rem;color:var(--gold)">${l.sender||'—'}</span></td>
-      <td><span style="color:${opColor};font-weight:700;font-size:.78rem">${l.operation||'—'}</span></td>
-      ${cell(l.client_name)}
-      <td style="direction:ltr;text-align:right">${l.client_phone||'—'}</td>
-      ${cell(l.responsible)}
       ${cell(l.service)}
       ${cell(l.product_description)}
       <td style="text-align:center;font-weight:700">${qty||'—'}</td>
@@ -2283,9 +2183,7 @@ function renderV2(list){
       <td style="color:var(--gold);font-weight:700">${total?total.toLocaleString('ar-SA')+' ر.س':'—'}</td>
       ${cell(l.shipped_to_account)}
       ${cell(l.shipped_from_account)}
-      <td><span style="background:var(--card2);padding:2px 8px;border-radius:6px;font-size:.78rem">${l.experience_rating||'—'}</span></td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis" title="${l.notes||''}">${l.notes||'—'}</td>
-      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis" title="${l.improvements||''}">${l.improvements||'—'}</td>
     </tr>`;
   }).join('');
 }
@@ -2342,7 +2240,6 @@ function renderMarketing(){
     clientMap[k].count++;
     clientMap[k].total+=amt(l);
     if(l.product_description) clientMap[k].products.add(l.product_description);
-    const r=parseFloat(l.experience_rating);
     if(!isNaN(r)) clientMap[k].ratings.push(r);
   });
   const clients=Object.values(clientMap).sort((a,b)=>b.total-a.total);
@@ -2355,9 +2252,7 @@ function renderMarketing(){
     return clientMap[k]&&clientMap[k].count>1;
   }).length/data.length)*100).toFixed(1):0;
 
-  // متوسط التقييم
-  const allRatings=data.map(l=>parseFloat(l.experience_rating)).filter(r=>!isNaN(r));
-  const avgRating=allRatings.length>0?(allRatings.reduce((s,r)=>s+r,0)/allRatings.length).toFixed(1):0;
+  const avgRating=0;
 
   // ── الخصومات ──
   const discountedLetters=approvedData.filter(l=>parseFloat(l.discount_pct)>0);
@@ -2396,7 +2291,7 @@ function renderMarketing(){
   document.getElementById('mkt_repeat_clients').textContent = repeatClients;
   document.getElementById('mkt_retention_rate').textContent = `معدل الاحتفاظ ${retentionRate}%`;
   document.getElementById('mkt_new_clients').textContent    = newClients;
-  document.getElementById('mkt_avg_rating').textContent     = avgRating>0?`${avgRating}/10`:'—';
+
   document.getElementById('mkt_cac').textContent            = cac+' ر.س';
   document.getElementById('mkt_conv_rate').textContent      = convRate+'%';
   document.getElementById('mkt_conv_sub').textContent       = `${data.length} من ${allLetters.length} خطاب`;
@@ -2463,21 +2358,7 @@ function renderMarketing(){
       ${bar((t.total/maxTeam)*100,'rgba(55,138,221,.7)')}
     </div>`).join('')||'<div style="color:var(--text-muted);font-size:.85rem">لا توجد بيانات</div>';
 
-  // ── رضا العملاء ──
-  const rBuckets={'ممتاز (9-10)':0,'جيد جداً (7-8)':0,'جيد (5-6)':0,'ضعيف (1-4)':0,'بدون تقييم':0};
-  data.forEach(l=>{
-    const r=parseFloat(l.experience_rating);
-    if(isNaN(r)||l.experience_rating==='N/A') rBuckets['بدون تقييم']++;
-    else if(r>=9) rBuckets['ممتاز (9-10)']++;
-    else if(r>=7) rBuckets['جيد جداً (7-8)']++;
-    else if(r>=5) rBuckets['جيد (5-6)']++;
-    else rBuckets['ضعيف (1-4)']++;
-  });
-  const tRated=data.length||1;
-  const satColors={'ممتاز (9-10)':'#27ae60','جيد جداً (7-8)':'#2ecc71','جيد (5-6)':'#f0a500','ضعيف (1-4)':'#e74c3c','بدون تقييم':'#555'};
-  document.getElementById('mkt_satisfaction').innerHTML=Object.entries(rBuckets).map(([k,v])=>`
-    <div class="mkt-row"><span class="mkt-row-label">${k}</span><span class="mkt-row-val" style="color:${satColors[k]}">${v} (${((v/tRated)*100).toFixed(1)}%)</span></div>
-    ${bar((v/tRated)*100,satColors[k])}`).join('');
+
 
   // ── الحسابات ──
   const accMap={};
@@ -2531,7 +2412,7 @@ function renderMarketing(){
     <div style="overflow-x:auto">
       <table class="mkt-table">
         <thead><tr>
-          <th>كود الخصم</th><th>عدد الاستخدامات</th>
+          <th>المنتج</th><th>عدد الاستخدامات</th>
           <th>المبلغ الأصلي</th><th>المبلغ بعد الخصم</th>
           <th>إجمالي الخصم المُعطى</th><th>الربح المتحقق</th><th>الاستخدام</th>
         </tr></thead>
