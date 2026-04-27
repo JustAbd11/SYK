@@ -1302,9 +1302,17 @@ async function saveLetter(btn){
   const receiptFile=document.getElementById('f_receipt').files[0];
   if(receiptFile){
     try{
-      const {data:up,error}=await supabase.storage.from('receipts').upload(`${letterNum}-${Date.now()}`,receiptFile,{upsert:true});
-      if(!error&&up){ const {data:pub}=supabase.storage.from('receipts').getPublicUrl(up.path); data.receipt_url=pub?.publicUrl||null; }
-    }catch(e){}
+      // تنظيف اسم الملف من الأحرف الخاصة
+      const ext = receiptFile.name.split('.').pop().toLowerCase()||'jpg';
+      const cleanName = letterNum.replace(/[^a-zA-Z0-9]/g,'_') + '_' + Date.now() + '.' + ext;
+      const {data:up,error}=await supabase.storage.from('receipts').upload(cleanName, receiptFile, {upsert:true, contentType: receiptFile.type});
+      if(!error&&up){
+        const {data:pub}=supabase.storage.from('receipts').getPublicUrl(up.path);
+        data.receipt_url=pub?.publicUrl||null;
+      } else if(error){
+        console.warn('Storage error:', error.message);
+      }
+    }catch(e){ console.warn('Upload failed:', e.message); }
   }
   if(receiptDataURL) localStorage.setItem('receipt_'+letterNum,receiptDataURL);
   try{
