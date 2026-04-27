@@ -1285,55 +1285,66 @@ async function saveLetter(btn){
   const isST = type==='ST';
   const serviceVal = isST ? (document.getElementById('f_service_st')?.value||'N/A') : val('f_service');
   const productDesc = isST ? (document.getElementById('f_product_st').value||'N/A') : val('f_product_description');
+  const qNum = parseFloat(document.getElementById('f_quantity')?.value)||0;
+  const pNum = parseFloat(document.getElementById('f_sale_price')?.value)||0;
+
+  // ── بيانات الخطاب بدون total_amount (غير موجود في Supabase) ──
   const data={
     letter_number:letterNum, letter_prefix:prefix, letter_type:type, letter_year:year,
     sender:CURRENT_DISPLAY, status:'pending',
     service:serviceVal, product_description:productDesc,
     quantity:val('f_quantity'), sale_price:val('f_sale_price'),
-    total_amount: (()=>{
-      const q=parseFloat(document.getElementById('f_quantity')?.value)||0;
-      const p=parseFloat(document.getElementById('f_sale_price')?.value)||0;
-      return q*p;
-    })(),
     shipped_to_account:val('f_shipped_to'), shipped_from_account:val('f_shipped_from'),
     notes:val('f_notes'),
     receipt_url:null,
   };
+
+  // ── رفع الايصال لـ Supabase Storage فقط (بدون localStorage) ──
   const receiptFile=document.getElementById('f_receipt').files[0];
   if(receiptFile){
     try{
-      // تنظيف اسم الملف من الأحرف الخاصة
       const ext = receiptFile.name.split('.').pop().toLowerCase()||'jpg';
-      const cleanName = letterNum.replace(/[^a-zA-Z0-9]/g,'_') + '_' + Date.now() + '.' + ext;
-      const {data:up,error}=await supabase.storage.from('receipts').upload(cleanName, receiptFile, {upsert:true, contentType: receiptFile.type});
+      const cleanName = letterNum.replace(/[^a-zA-Z0-9]/g,'_')+'_'+Date.now()+'.'+ext;
+      const {data:up,error}=await supabase.storage
+        .from('receipts')
+        .upload(cleanName, receiptFile, {upsert:true, contentType:receiptFile.type});
       if(!error&&up){
         const {data:pub}=supabase.storage.from('receipts').getPublicUrl(up.path);
         data.receipt_url=pub?.publicUrl||null;
-      } else if(error){
-        console.warn('Storage error:', error.message);
+      } else {
+        console.warn('Storage error:', error?.message);
       }
     }catch(e){ console.warn('Upload failed:', e.message); }
   }
-  if(receiptDataURL) localStorage.setItem('receipt_'+letterNum,receiptDataURL);
+
+  // ── حفظ في Supabase ──
+  let saved=false;
   try{
     const {error}=await supabase.from('letters').insert([data]);
     if(error) throw error;
+    saved=true;
   }catch(e){
-    const local=JSON.parse(localStorage.getItem('syk_letters')||'[]');
-    data.id=Date.now().toString(); data.created_at=new Date().toISOString();
-    local.push(data); localStorage.setItem('syk_letters',JSON.stringify(local));
+    console.warn('Supabase insert error:', e.message);
+    // fallback: حفظ محلي بدون صورة الايصال (عشان ما يملأ localStorage)
+    try{
+      const local=JSON.parse(localStorage.getItem('syk_letters')||'[]');
+      data.id=Date.now().toString(); data.created_at=new Date().toISOString();
+      // احفظ بدون receipt_url في localStorage
+      const localData={...data, receipt_url:null};
+      local.push(localData);
+      localStorage.setItem('syk_letters',JSON.stringify(local));
+      saved=true;
+    }catch(le){
+      showToast('⚠️ فشل الحفظ — تحقق من الاتصال',true);
+    }
   }
-  showToast('✅ تم حفظ الخطاب بنجاح');
+
+  if(saved){
+    showToast('✅ تم حفظ الخطاب بنجاح');
+    resetForm();
+    if(IS_ADMIN) loadLetters(); else loadInbox();
+  }
   if(btn){ btn.disabled=false; btn.textContent='💾 حفظ الخطاب'; }
-  resetForm();
-  // تحديث المحفوظات وصندوق الوارد في الخلفية
-  if(IS_ADMIN){
-    loadLetters();
-  } else {
-    loadInbox();
-  }
-  // تحديث الرقم التلقائي للخطاب التالي
-  if(document.getElementById('f_type').value) fetchNextNumber();
 }
 function resetForm(){
   ['f_service','f_product_description','f_quantity','f_sale_price','f_shipped_to','f_notes']
