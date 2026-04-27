@@ -1318,6 +1318,14 @@ async function saveLetter(btn){
   showToast('✅ تم حفظ الخطاب بنجاح');
   if(btn){ btn.disabled=false; btn.textContent='💾 حفظ الخطاب'; }
   resetForm();
+  // تحديث المحفوظات وصندوق الوارد في الخلفية
+  if(IS_ADMIN){
+    loadLetters();
+  } else {
+    loadInbox();
+  }
+  // تحديث الرقم التلقائي للخطاب التالي
+  if(document.getElementById('f_type').value) fetchNextNumber();
 }
 function resetForm(){
   ['f_service','f_product_description','f_quantity','f_sale_price','f_shipped_to','f_notes']
