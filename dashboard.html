@@ -2279,11 +2279,10 @@ function renderMarketing(){
   const clientMap={};
   data.forEach(l=>{
     const k=(l.sender||'غير محدد').trim();
-    if(!clientMap[k]) clientMap[k]={name:k,count:0,total:0,products:new Set(),ratings:[],phone:'—'};
+    if(!clientMap[k]) clientMap[k]={name:k,count:0,total:0,products:new Set(),phone:'—'};
     clientMap[k].count++;
     clientMap[k].total+=amt(l);
     if(l.product_description) clientMap[k].products.add(l.product_description);
-    if(!isNaN(r)) clientMap[k].ratings.push(r);
   });
   const clients=Object.values(clientMap).sort((a,b)=>b.total-a.total);
   const totalClients=clients.length;
