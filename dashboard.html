@@ -290,9 +290,12 @@
     <div class="section-card">
       <div class="section-title">القسم المالي</div>
       <div class="form-grid">
-        <div class="form-group"><label>الكمية</label><input type="text" id="f_quantity" placeholder="الكمية" oninput="calcDiscountedPrice()"></div>
-        <div class="form-group"><label>سعر البيع</label><input type="text" id="f_sale_price" placeholder="مثال: 150 ريال" oninput="calcDiscountedPrice()"></div>
-
+        <div class="form-group"><label>الكمية</label><input type="text" id="f_quantity" placeholder="الكمية" oninput="calcTotal()"></div>
+        <div class="form-group"><label>السعر</label><input type="text" id="f_sale_price" placeholder="مثال: 150" oninput="calcTotal()"></div>
+        <div class="form-group full">
+          <label>المجموع</label>
+          <div id="f_total_preview" style="background:var(--card2);border:2px solid var(--gold);border-radius:8px;padding:12px 16px;font-size:1.2rem;font-weight:700;color:var(--gold);text-align:center">—</div>
+        </div>
         <div class="form-group full">
           <label>تم الشحن من حساب (صاحب المتجر)</label>
           <select id="f_shipped_from">
@@ -1221,6 +1224,15 @@ function onSTServiceChange(){
   };
 }
 
+function calcTotal(){
+  const qty   = parseFloat(document.getElementById('f_quantity')?.value)||0;
+  const price = parseFloat(document.getElementById('f_sale_price')?.value)||0;
+  const el    = document.getElementById('f_total_preview');
+  if(!el) return;
+  if(!qty||!price){ el.textContent='—'; return; }
+  el.textContent = (qty*price).toLocaleString('ar-SA') + ' ر.س';
+}
+
 async function fetchNextNumber(){
   const type = document.getElementById('f_type').value;
   const year = document.getElementById('f_year').value || CUR_YEAR;
@@ -1278,6 +1290,11 @@ async function saveLetter(btn){
     sender:CURRENT_DISPLAY, status:'pending',
     service:serviceVal, product_description:productDesc,
     quantity:val('f_quantity'), sale_price:val('f_sale_price'),
+    total_amount: (()=>{
+      const q=parseFloat(document.getElementById('f_quantity')?.value)||0;
+      const p=parseFloat(document.getElementById('f_sale_price')?.value)||0;
+      return q*p;
+    })(),
     shipped_to_account:val('f_shipped_to'), shipped_from_account:val('f_shipped_from'),
     notes:val('f_notes'),
     receipt_url:null,
@@ -1317,6 +1334,7 @@ function resetForm(){
   document.getElementById('autoLetterNum').textContent='اختر النوع';
   document.getElementById('receiptPreview').style.display='none';
   document.getElementById('receiptLabel').textContent='📎 انقر لرفع الايصال';
+  const tp=document.getElementById('f_total_preview'); if(tp) tp.textContent='—';
   receiptDataURL=null; currentLetterNum=null;
 }
 
@@ -1419,9 +1437,10 @@ async function approveLetter(id){
   try{ const {error}=await supabase.from('letters').update({status:'approved'}).eq('id',id); if(error) throw error; }
   catch(e){ const loc=JSON.parse(localStorage.getItem('syk_letters')||'[]'); const i=loc.findIndex(x=>x.id==id); if(i>-1){loc[i].status='approved';localStorage.setItem('syk_letters',JSON.stringify(loc));} }
   showToast('✅ تم القبول'); closeModal(); loadLetters();
-  // تحديث المالية والتسويق لو كانا مفتوحَين
-  if(document.getElementById('tab-finance').classList.contains('active')) loadFinance();
-  if(document.getElementById('tab-marketing').classList.contains('active')) loadMarketing();
+  if(document.getElementById('tab-finance').classList.contains('active'))   loadFinance();
+  if(document.getElementById('tab-marketing').classList.contains('active'))  loadMarketing();
+  // تحديث بيانات التسويق في الخلفية دائماً
+  if(typeof mktData!=='undefined') mktData=[...mktData.filter(l=>l.id!=id),...[{...mktData.find(l=>l.id==id)||{},status:'approved'}]];
 }
 async function updateLetter(id){
   const keys=['service','product_description','quantity','sale_price','shipped_to_account','shipped_from_account','notes'];
