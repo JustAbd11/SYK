@@ -84,11 +84,17 @@ function buildHTML(data, logoSrc) {
       ['وصف المنتج :',             data.product_description],
       ['تم الشحن المباشر للحساب:', data.shipped_to_account],
     ])}
-    ${sec('.٢ القسم المالي :',[
-      ['الكمية:',            data.quantity],
-      ['السعر:',            `( ${s} ) ريال.`],
-      ['تم الشحن من حساب:', data.shipped_from_account],
-    ])}
+    ${sec('.٢ القسم المالي :', (()=>{
+      const qty   = parseFloat(data.quantity)||0;
+      const price = parseFloat(data.sale_price)||0;
+      const total = data.total_amount||(qty*price);
+      return [
+        ['الكمية:',            data.quantity],
+        ['السعر:',             `( ${s} ) ريال.`],
+        ['المجموع:',           `( ${total.toLocaleString('ar-SA')} ) ريال.`],
+        ['تم الشحن من حساب:', data.shipped_from_account],
+      ];
+    })())}
     ${sec('.٣ ملاحظات :',[
       ['ملاحظات:',      data.notes||'—'],
     ])}
@@ -98,8 +104,7 @@ function buildHTML(data, logoSrc) {
     <p style="margin:0 0 6px;font-size:10.5px;line-height:1.65">نشكركم على جهودكم المخلصة ودقتكم في تنفيذ هذه العملية، إن التزامكم بتدوين هذه البيانات بمهنية عالية هو الركيزة التي نعتمد عليها في مراجعة نجاحاتنا السنوية وتطوير مستقبل متجرنا، نرجو منكم الاحتفاظ بهذا السجل والعناية به كمرجع أساسي يثبت جودة أدائكم ويعكس احترافيتكم في خدمة عملائنا، نحن نفخر بوجودكم معنا، ومعاً نستمر في تقديم الأفضل."</p>
     <p style="text-align:center;font-weight:700;margin:4px 0 10px;font-size:11px">تحية طيبة،،</p>
 
-    <!-- توقيعات -->
-    
+   
   </div>`;
 }
 
