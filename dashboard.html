@@ -407,11 +407,7 @@
           <option value="NO">NO</option>
           <option value="AM">AM</option>
         </select>
-        <select id="v2_op" onchange="filterV2()">
-          <option value="">بيع وشراء</option>
-          <option value="تم البيع">بيع</option>
-          <option value="تم الشراء">شراء</option>
-        </select>
+
         <button class="btn btn-outline" onclick="loadV2()">🔄</button>
       </div>
 
@@ -425,19 +421,14 @@
               <th>رقم الخطاب</th>
               <th>التاريخ</th>
               <th>المرسل</th>
-              <th>العملية</th>
-              <th>الاسم</th>
-              <th>الجوال</th>
-              <th>المسؤول</th>
               <th>الخدمة</th>
               <th>وصف المنتج</th>
               <th>الكمية</th>
-              <th>سعر البيع</th>
+              <th>السعر</th>
               <th>المجموع</th>
               <th>شحن للحساب</th>
               <th>شحن من حساب</th>
               <th>ملاحظات</th>
-              <th>التحسينات</th>
             </tr>
           </thead>
           <tbody id="v2Body"></tbody>
@@ -1381,7 +1372,7 @@ async function loadInbox(){
   if(!letters.length){ grid.innerHTML='<div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">لا توجد خطابات بعد</div>'; return; }
   grid.innerHTML=letters.map(l=>{
     const statusBadge=l.status==='approved'?'<span class="status-badge status-approved">✅ مقبول</span>':'<span class="status-badge status-pending">⏳ تحت المراجعة</span>';
-    return `<div class="letter-card"><div class="lc-number">${l.letter_number}</div><div class="lc-client">${l.client_name}</div><div class="lc-date">${new Date(l.created_at).toLocaleDateString('ar-SA')}</div><div style="margin-top:6px">${statusBadge}</div></div>`;
+    return `<div class="letter-card"><div class="lc-number">${l.letter_number}</div><div class="lc-date">${new Date(l.created_at).toLocaleDateString('ar-SA')}</div><div style="margin-top:6px">${statusBadge}</div></div>`;
   }).join('');
 }
 
@@ -1407,7 +1398,7 @@ function renderLetters(list){
     const sb=l.status==='approved'?'<span class="status-badge status-approved">✅ مقبول</span>':'<span class="status-badge status-pending">⏳ مراجعة</span>';
     return `<div class="letter-card" onclick="openLetter('${l.id}')">
       <div class="lc-number">${l.letter_number} ${hasR}</div>
-      <div class="lc-client">${l.client_name}</div>
+
       <div class="lc-date">${d.toLocaleDateString('ar-SA')}</div>
       <div style="margin-top:4px;font-size:.75rem;color:var(--text-muted)">من: <b style="color:var(--gold)">${l.sender||'Admin'}</b></div>
       <div style="margin-top:4px">${sb}</div>
@@ -1421,7 +1412,7 @@ function filterLetters(){
   const m=document.getElementById('filterMonth').value;
   renderLetters(allLetters.filter(l=>{
     const d=new Date(l.created_at);
-    return(!q||l.letter_number?.toLowerCase().includes(q)||l.client_name?.toLowerCase().includes(q))
+    return(!q||l.letter_number?.toLowerCase().includes(q)||l.sender?.toLowerCase().includes(q)||l.service?.toLowerCase().includes(q)||l.product_description?.toLowerCase().includes(q))
       &&(!s||l.sender===s)&&(!st||l.status===st||(st==='pending'&&!l.status))
       &&(!m||String(d.getMonth()+1).padStart(2,'0')===m);
   }));
@@ -1464,10 +1455,15 @@ async function approveLetter(id){
   try{ const {error}=await supabase.from('letters').update({status:'approved'}).eq('id',id); if(error) throw error; }
   catch(e){ const loc=JSON.parse(localStorage.getItem('syk_letters')||'[]'); const i=loc.findIndex(x=>x.id==id); if(i>-1){loc[i].status='approved';localStorage.setItem('syk_letters',JSON.stringify(loc));} }
   showToast('✅ تم القبول'); closeModal(); loadLetters();
-  if(document.getElementById('tab-finance').classList.contains('active'))   loadFinance();
-  if(document.getElementById('tab-marketing').classList.contains('active'))  loadMarketing();
-  // تحديث بيانات التسويق في الخلفية دائماً
-  if(typeof mktData!=='undefined') mktData=[...mktData.filter(l=>l.id!=id),...[{...mktData.find(l=>l.id==id)||{},status:'approved'}]];
+  if(document.getElementById('tab-finance').classList.contains('active'))  loadFinance();
+  if(document.getElementById('tab-v2').classList.contains('active'))       loadV2();
+  // تحديث التسويق دائماً في الخلفية
+  if(typeof mktData!=='undefined'){
+    const idx=mktData.findIndex(l=>l.id==id);
+    if(idx>-1) mktData[idx]={...mktData[idx],status:'approved'};
+    else mktData.push({id,status:'approved'});
+  }
+  if(document.getElementById('tab-marketing').classList.contains('active')) loadMarketing();
 }
 async function updateLetter(id){
   const keys=['service','product_description','quantity','sale_price','shipped_to_account','shipped_from_account','notes'];
@@ -1684,7 +1680,7 @@ async function loadTrash(){
     const left=Math.max(0,30-Math.floor((Date.now()-dd.getTime())/86400000));
     return `<div class="trash-card">
       <div class="lc-number">${l.letter_number}</div>
-      <div style="font-size:.82rem;color:var(--text-muted)">${l.client_name}</div>
+      <div style="font-size:.82rem;color:var(--text-muted)">${l.service||l.product_description||''}</div>
       <div class="lc-date">حُذف: ${dd.toLocaleDateString('ar-SA')}</div>
       <div class="days-left">يُحذف نهائياً بعد ${left} يوم</div>
       <div style="display:flex;gap:6px;justify-content:center;margin-top:8px">
@@ -2175,7 +2171,7 @@ function filterV2(){
   const mon  = document.getElementById('v2_month').value;
   const yr   = document.getElementById('v2_year').value;
   const type = document.getElementById('v2_type').value;
-  const op   = document.getElementById('v2_op').value;
+  const op = '';
 
   const filtered = v2Data.filter(l=>{
     const d = new Date(l.created_at);
@@ -2183,7 +2179,7 @@ function filterV2(){
     const matchMon  = mon===''|| String(d.getMonth())  === mon;
     const matchYr   = !yr   || String(d.getFullYear()) === yr;
     const matchType = !type || l.letter_type === type;
-    const matchOp   = !op   || l.operation   === op;
+    const matchOp = true;
     const matchQ    = !q    || [
       l.letter_number, l.service, l.product_description,
       l.quantity, l.sale_price, l.shipped_to_account,
@@ -2201,25 +2197,25 @@ function renderV2(list){
   count.textContent = `إجمالي: ${list.length} خطاب مقبول`;
 
   if(!list.length){
-    tbody.innerHTML=`<tr><td colspan="18" class="v2-empty">لا توجد خطابات مطابقة</td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="12" class="v2-empty">لا توجد خطابات مطابقة</td></tr>`;
     return;
   }
 
   tbody.innerHTML = list.map((l,i)=>{
-    const d   = new Date(l.created_at);
+    const d     = new Date(l.created_at);
     const dateStr = d.toLocaleDateString('ar-SA',{year:'numeric',month:'2-digit',day:'2-digit'});
-    const qty  = parseFloat(l.quantity)   || 0;
-    const price= parseFloat(l.sale_price) || 0;
-    const total= qty * price;
-    const opColor = l.operation==='تم البيع' ? '#27ae60' : '#378add';
-    const typeColor= {ST:'#e8722a',LC:'#9b59b6',NO:'#e74c3c',AM:'#f0a500'}[l.letter_type]||'#888';
-
-    function cell(val){ return `<td title="${val||''}">${val||'—'}</td>`; }
+    const qty   = parseFloat(l.quantity)   || 0;
+    const price = parseFloat(l.sale_price) || 0;
+    const total = l.total_amount || (qty * price);
+    const typeColor = {ST:'#e8722a',LC:'#9b59b6',NO:'#e74c3c',AM:'#f0a500'}[l.letter_type]||'#888';
+    function cell(v){ return `<td title="${v||''}">${v||'—'}</td>`; }
 
     return `<tr>
       <td style="color:var(--text-muted);font-size:.75rem">${i+1}</td>
-      <td><b style="color:var(--gold)">${l.letter_number||'—'}</b>
-          <span style="display:block;font-size:.7rem;color:${typeColor};font-weight:600">${l.letter_type||''}</span></td>
+      <td>
+        <b style="color:var(--gold)">${l.letter_number||'—'}</b>
+        <span style="display:block;font-size:.7rem;color:${typeColor};font-weight:600">${l.letter_type||''}</span>
+      </td>
       <td style="color:var(--text-muted);font-size:.78rem">${dateStr}</td>
       <td><span style="background:var(--card2);padding:2px 8px;border-radius:6px;font-size:.78rem;color:var(--gold)">${l.sender||'—'}</span></td>
       ${cell(l.service)}
@@ -2229,7 +2225,7 @@ function renderV2(list){
       <td style="color:var(--gold);font-weight:700">${total?total.toLocaleString('ar-SA')+' ر.س':'—'}</td>
       ${cell(l.shipped_to_account)}
       ${cell(l.shipped_from_account)}
-      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis" title="${l.notes||''}">${l.notes||'—'}</td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;color:var(--text-muted)" title="${l.notes||''}">${l.notes||'—'}</td>
     </tr>`;
   }).join('');
 }
@@ -2281,8 +2277,8 @@ function renderMarketing(){
   // ── تجميع العملاء ──
   const clientMap={};
   data.forEach(l=>{
-    const k=(l.client_name||'غير محدد').trim();
-    if(!clientMap[k]) clientMap[k]={name:k,count:0,total:0,products:new Set(),ratings:[],phone:l.client_phone||'—'};
+    const k=(l.sender||'غير محدد').trim();
+    if(!clientMap[k]) clientMap[k]={name:k,count:0,total:0,products:new Set(),ratings:[],phone:'—'};
     clientMap[k].count++;
     clientMap[k].total+=amt(l);
     if(l.product_description) clientMap[k].products.add(l.product_description);
@@ -2294,7 +2290,7 @@ function renderMarketing(){
   const newClients=clients.filter(c=>c.count===1).length;
   const retentionRate=totalClients>0?((repeatClients/totalClients)*100).toFixed(1):0;
   const repeatRate=data.length>0?((data.filter(l=>{
-    const k=(l.client_name||'').trim();
+    const k=(l.sender||'غير محدد').trim();
     return clientMap[k]&&clientMap[k].count>1;
   }).length/data.length)*100).toFixed(1):0;
 
@@ -2390,7 +2386,7 @@ function renderMarketing(){
     if(!teamMap[k]) teamMap[k]={name:k,count:0,total:0,clients:new Set()};
     teamMap[k].count++;
     teamMap[k].total+=amt(l);
-    teamMap[k].clients.add((l.client_name||'').trim());
+    teamMap[k].count++;
   });
   const team=Object.values(teamMap).sort((a,b)=>b.total-a.total);
   const maxTeam=team[0]?.total||1;
@@ -2632,7 +2628,7 @@ function calcBudgetFromLetters(month, year){
     const disc=parseFloat(l.discount_pct)||0;
     return s+(disc>0?base*(1-disc/100):base);
   },0);
-  const clients = new Set(letters.map(l=>(l.client_name||'').trim()).filter(Boolean)).size;
+  const clients = new Set(letters.map(l=>(l.sender||'').trim()).filter(Boolean)).size;
   return { letters:letters.length, sells:sells.length, totalSales, clients };
 }
 
@@ -2820,7 +2816,7 @@ function calcCampaignFromLetters(startDate, endDate){
     const disc=parseFloat(l.discount_pct)||0;
     return s+(disc>0?base*(1-disc/100):base);
   },0);
-  const clients = new Set(letters.map(l=>(l.client_name||'').trim()).filter(Boolean)).size;
+  const clients = new Set(letters.map(l=>(l.sender||'').trim()).filter(Boolean)).size;
   return { letters:letters.length, sells:sells.length, totalSales, clients };
 }
 
