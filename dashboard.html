@@ -1560,8 +1560,8 @@ function renderFinance(){
     return matchMonth && matchYear && matchType && matchSvc && matchProd;
   });
 
-  const buyRows  = filtered.filter(l=>l.operation==='تم الشراء');
-  const sellRows = filtered.filter(l=>l.operation==='تم البيع');
+  const buyRows  = filtered.filter(l=>l.operation==='تم الشراء' && !!l.operation);
+  const sellRows = filtered.filter(l=>!l.operation||l.operation==='تم البيع'); // كل الخطابات الجديدة = بيع
 
   // دمج المنتجات: نفس المنتج + نفس الخصم = صف واحد
   function mergeRows(rows){
@@ -1653,8 +1653,8 @@ function exportFinanceExcel(){
   }
 
   const wb = XLSX.utils.book_new();
-  const buySheet  = XLSX.utils.json_to_sheet(toMergedRows(filtered.filter(l=>l.operation==='تم الشراء')));
-  const sellSheet = XLSX.utils.json_to_sheet(toMergedRows(filtered.filter(l=>l.operation==='تم البيع')));
+  const buySheet  = XLSX.utils.json_to_sheet(toMergedRows(filtered.filter(l=>l.operation==='تم الشراء' && l.operation)));
+  const sellSheet = XLSX.utils.json_to_sheet(toMergedRows(filtered.filter(l=>!l.operation||l.operation==='تم البيع')));
   XLSX.utils.book_append_sheet(wb, buySheet,  'الشراء - ST');
   XLSX.utils.book_append_sheet(wb, sellSheet, 'البيع - ST');
 
@@ -1768,7 +1768,7 @@ function qty(l){return R(l.quantity);}
 
 // بناء بيانات الفترة حسب النوع
 function periodData(rows,op){
-  const sel=rows.filter(l=>l.operation===op);
+  const sel = op==='تم البيع' ? rows.filter(l=>!l.operation||l.operation===op) : rows.filter(l=>l.operation===op);
   const map={};
   sel.forEach(l=>{
     const d=new Date(l.created_at);
@@ -1795,8 +1795,8 @@ function dc(id,type,data,opts){
 
 function renderCharts(){
   const data=fData();
-  const sells=data.filter(l=>l.operation==='تم البيع');
-  const buys=data.filter(l=>l.operation==='تم الشراء');
+  const sells=data.filter(l=>!l.operation||l.operation==='تم البيع');
+  const buys=data.filter(l=>l.operation==='تم الشراء'&&l.operation);
 
   const ts=sells.reduce((s,l)=>s+amt(l),0);
   const tb=buys.reduce((s,l)=>s+amt(l),0);
@@ -2112,8 +2112,8 @@ function renderComparison(){
     });
   }
   function cp(rows){
-    const s=rows.filter(l=>l.operation==='تم البيع');
-    const b=rows.filter(l=>l.operation==='تم الشراء');
+    const s=rows.filter(l=>!l.operation||l.operation==='تم البيع');
+    const b=rows.filter(l=>l.operation==='تم الشراء'&&l.operation);
     const ts=s.reduce((x,l)=>x+amt(l),0);
     const tb=b.reduce((x,l)=>x+amt(l),0);
     return{sell:ts,buy:tb,profit:ts-tb,count:rows.length,margin:ts>0?((ts-tb)/ts*100):0};
@@ -2260,9 +2260,10 @@ function renderMarketing(){
   // فقط الخطابات المقبولة للأرقام المالية
   const approvedData = data.filter(l=>l.status==='approved');
   function amt(l){
+    // استخدم total_amount لو موجود، وإلا احسب من الكمية × السعر
+    if(l.total_amount && parseFloat(l.total_amount)>0) return parseFloat(l.total_amount);
     const base=(parseFloat(l.quantity)||0)*(parseFloat(l.sale_price)||0);
-    const disc=parseFloat(l.discount_pct)||0;
-    return disc>0 ? base*(1-disc/100) : base;
+    return base;
   }
   function amtBase(l){return(parseFloat(l.quantity)||0)*(parseFloat(l.sale_price)||0);}
   function fmt(n){return Number(n).toLocaleString('ar-SA');}
@@ -2487,8 +2488,8 @@ function renderMarketing(){
     </div>`:'<div style="color:var(--text-muted);font-size:.85rem;padding:12px">لا توجد خطابات بخصم في هذه الفترة.</div>';
 
   // ── تحليل المبيعات المتقدم ──
-  const sellData=data.filter(l=>l.operation==='تم البيع');
-  const buyData=data.filter(l=>l.operation==='تم الشراء');
+  const sellData=data.filter(l=>!l.operation||l.operation==='تم البيع');
+  const buyData=data.filter(l=>l.operation==='تم الشراء'&&l.operation);
   const totalSell=sellData.reduce((s,l)=>s+amt(l),0);
   const totalBuy=buyData.reduce((s,l)=>s+amt(l),0);
   const profit=totalSell-totalBuy;
@@ -2622,7 +2623,7 @@ function calcBudgetFromLetters(month, year){
       && String(d.getMonth())===String(month)
       && String(d.getFullYear())===String(year);
   });
-  const sells = letters.filter(l=>l.operation==='تم البيع');
+  const sells = letters.filter(l=>!l.operation||l.operation==='تم البيع');
   const totalSales = sells.reduce((s,l)=>{
     const base=(parseFloat(l.quantity)||0)*(parseFloat(l.sale_price)||0);
     const disc=parseFloat(l.discount_pct)||0;
@@ -2810,7 +2811,7 @@ function calcCampaignFromLetters(startDate, endDate){
     if(end   && d > end)   return false;
     return true;
   });
-  const sells = letters.filter(l=>l.operation==='تم البيع');
+  const sells = letters.filter(l=>!l.operation||l.operation==='تم البيع');
   const totalSales = sells.reduce((s,l)=>{
     const base=(parseFloat(l.quantity)||0)*(parseFloat(l.sale_price)||0);
     const disc=parseFloat(l.discount_pct)||0;
